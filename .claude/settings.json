@@ -1,0 +1,77 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/schemas/settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git ls-files:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(jq:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run lint:*)",
+      "Bash(pytest:*)",
+      "Bash(cargo test:*)",
+      "Bash(go test:*)",
+      "Read(*)",
+      "Glob(*)",
+      "Grep(*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-commit-tdd.sh" }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          { "type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-cycle-overrun.sh" },
+          { "type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-output-without-signoff.sh" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          { "type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/enforce-portability.sh" }
+        ]
+      }
+    ]
+  },
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "$CLAUDE_PROJECT_DIR"]
+    },
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git", "--repository", "$CLAUDE_PROJECT_DIR"]
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  },
+  "_pluginsNote": "Claude Code plugins are installed via the /plugin install command and live globally in ~/.claude/plugins/. To enable the recommended plugins for this repo, run after cloning: `/plugin marketplace add anthropics/claude-plugins-official` then `/plugin install obra/superpowers` and `/plugin install affaan-m/everything-claude-code`. See .claude/MCP-SETUP.md for full instructions.",
+  "_disablingHooks": "To disable a specific hook for a session, comment out its entry above (JSON does not support comments natively; remove the entry temporarily and restore from git) or set CLAUDE_DISABLE_HOOKS=<hook-name> as an env var if your Claude Code version supports it."
+}

@@ -1,0 +1,31 @@
+---
+cycle: N
+findings: none | minor | critical
+findings-summary: <one line>
+---
+
+# Adversary report — cycle N
+
+## Attack surface considered
+
+<!-- What you tried to break: input ranges, concurrency, auth, perf cliffs, error paths. -->
+
+- ...
+
+## Tests written
+
+<!-- Tests added that probe edge cases. Reference src/ test paths. -->
+
+- ...
+
+## Critical findings
+
+<!-- Issues that BLOCK promotion to 04-output. Each must be reproducible. -->
+
+- ...
+
+## Minor findings (deferred)
+
+<!-- Issues worth filing but not blocking. -->
+
+- ...

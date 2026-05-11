@@ -1,0 +1,25 @@
+---
+cycle: N
+verdict: pass | fail
+verdict-reason: <one line>
+---
+
+# Reviewer report — cycle N
+
+## Spec compliance
+
+For each acceptance criterion in `01-spec/SPEC.md`:
+
+| # | Criterion | Met? | Evidence |
+|---|---|---|---|
+| 1 | ... | yes/no | <file:line or test name> |
+
+## Code quality findings
+
+<!-- Issues to fix before this can pass. Be specific: file:line, what to change, why. -->
+
+- ...
+
+## Notes
+
+<!-- Anything else the implementer should know. Not blockers. -->

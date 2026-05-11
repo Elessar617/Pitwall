@@ -1,0 +1,16 @@
+# .portability-deny.txt — domain-specific terms that must not appear in
+# .claude/rules/ or .claude/skills/ (enforced by enforce-portability.sh).
+#
+# Format: one term per line. Lines starting with # are comments. Blank lines
+# are ignored. Matching is case-insensitive substring grep.
+#
+# Each consumer repo edits this list to add its own project-specific terms
+# (vendor names, framework names, internal endpoints, brand terms).
+#
+# Examples (keep these commented; uncomment when relevant to YOUR project):
+# stripe
+# postgres
+# acme-corp
+# datadog
+# segment
+# braze
