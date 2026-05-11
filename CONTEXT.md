@@ -39,7 +39,7 @@ When starting a task, ask in order:
 | **Write user-facing docs** | `ship/CONTEXT.md` | `.claude/reference/tech-stack.md`, the relevant `04-output/OUTPUT.md` |
 | **Generate a release artifact** (`.docx`, `.pdf`, etc.) | `ship/CONTEXT.md` | `.claude/skills/{docx,pdf,pptx,xlsx}/SKILL.md` (whichever applies) |
 | **Author release notes** | `ship/CONTEXT.md` | `ship/changelog/`, recent `04-output/OUTPUT.md` files |
-| **Bootstrap THIS scaffold into another repo** | `START-HERE.md` | `.claude/MCP-SETUP.md` |
+| **Bootstrap THIS scaffold into another repo** | `docs/teaching/bootstrap.md` | `.claude/MCP-SETUP.md` |
 
 ---
 

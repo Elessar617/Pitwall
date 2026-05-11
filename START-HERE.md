@@ -1,20 +1,21 @@
 # Start Here
 
-A 5-minute orientation to this repo. Skip if you've worked here before.
+A 5-minute orientation for new contributors to **Pitwall**.
 
 ## What this repo is
 
-An agent-native scaffold for software development. Two roles:
+**Pitwall** is a terminal-UI companion for Formula 1: live timing + real-time track-position map during sessions, a season tracker for schedule / standings / results, and a strategy mini-game played alongside the actual race. See [`README.md`](README.md) for the public-facing overview.
 
-1. **A working lab** — numbered iterations (`lab/01-...`, `build/workflows/01-...`) for spikes, features, bug fixes, and refactors. The repo accumulates these over time.
-2. **A canonical scaffold** — the directory layout and markdown templates are domain-agnostic and can be copied into other repos as a starter.
+It's built on the **workspace-blueprint scaffold**, an agent-native template that organizes development into four workspaces (`spec/`, `lab/`, `build/`, `ship/`) and a four-agent build loop (planner → implementer ↔ reviewer ↔ adversary).
+
+If you want to use the same scaffold for a different project, see [`docs/teaching/bootstrap.md`](docs/teaching/bootstrap.md).
 
 ## How the structure works
 
 Three-layer routing keeps token usage tight:
 
-1. **`CLAUDE.md`** is always loaded. It's THE MAP — every directory, every convention.
-2. **`CONTEXT.md`** is the router. "What's your task → which workspace + what to load."
+1. **[`CLAUDE.md`](CLAUDE.md)** is always loaded. It's THE MAP — every directory, every convention.
+2. **[`CONTEXT.md`](CONTEXT.md)** is the router. "What's your task → which workspace + what to load."
 3. **Each workspace's `CONTEXT.md`** has the per-task load budget.
 
 Then the agent infrastructure:
@@ -24,6 +25,7 @@ Then the agent infrastructure:
 - **`.claude/agents/`** — 4 subagent specs (planner, implementer, reviewer, adversary)
 - **`.claude/hooks/`** — 4 bash hooks that enforce rules by construction
 - **`.claude/settings.json`** — wires hooks, MCP servers, plugins, permissions
+- **`.claude/reference/`** — F1 + Pitwall facts agents look up on demand
 
 ## How work flows
 
@@ -36,62 +38,49 @@ Have a small task? → spec/briefs/  (brief)
 When ready to build:
 spec/ artifact OR lab/REPORT.md (Pursue)
    → build/workflows/NN-<slug>/  (4 stages, 4 agents)
-   → src/  (the code itself)
+   → src/pitwall/  (the code itself)
    → ship/  (release notes, docs, deploy)
 ```
 
-The four-agent loop in `build/` is documented in `docs/orchestrator-process.md`.
+The four-agent loop in `build/` is documented in [`docs/orchestrator-process.md`](docs/orchestrator-process.md).
 
-## What to do FIRST after cloning (or forking)
-
-If you're using this repo AS your project (not just as a scaffold):
-
-1. **Run `.claude/MCP-SETUP.md` setup** — install the two recommended plugins, set up the GitHub PAT.
-2. **Fill in `.claude/reference/`:**
-   - `project-architecture.md` — describe what your project is and how it's organized
-   - `tech-stack.md` — languages, frameworks, lint/test/build commands
-   - `glossary.md` — domain terms agents need to know
-   - `frontend-stack.md` — only if you have a frontend (defaults provided)
-3. **Edit `.claude/.portability-deny.txt`** — add project-specific terms (vendor names, internal endpoints) so the portability hook catches drift.
-4. **Replace `<!-- REPLACE -->` markers** in `CLAUDE.md`, `CONTEXT.md`, `START-HERE.md`, `README.md`.
-
-If you're using this scaffold to bootstrap a NEW repo:
+## What to do FIRST after cloning
 
 ```bash
-# Option A: full clone (lab + scaffolding)
-git clone <this-repo> my-new-project
-rm -rf my-new-project/.git my-new-project/lab/[1-9]* my-new-project/spec/{rfcs,adrs,briefs}/* my-new-project/build/workflows/[1-9]*
-git init my-new-project
+git clone <pitwall-url> pitwall
+cd pitwall
 
-# Option B: scaffolding only (recommended)
-rsync -av \
-  --exclude='lab/[1-9]*' \
-  --exclude='build/workflows/[1-9]*' \
-  --exclude='spec/rfcs/*' --exclude='spec/adrs/*' --exclude='spec/briefs/*' \
-  --exclude='docs/explorations/*' \
-  --exclude='docs/superpowers/specs/*' --exclude='docs/superpowers/plans/*' \
-  --exclude='.git' \
-  workspace-blueprint/ my-new-project/
+# Install the Claude Code plugins this repo expects (user-scope, one-time).
+# See .claude/MCP-SETUP.md for the full list and the GitHub PAT step.
+claude plugin marketplace add pydantic/skills          # adds ai (Pydantic-AI helper)
+claude plugin install ai@pydantic-skills
+# karpathy-skills/andrej-karpathy-skills, obra/superpowers, and
+# affaan-m/everything-claude-code are also expected — confirm with `claude plugin list`.
 
-cd my-new-project
-git init
-# Then follow the "FIRST after cloning" steps above
+# Python project setup (once pyproject.toml lands):
+uv sync
+uv run pitwall
 ```
+
+Open Claude Code in this directory and the agent infrastructure boots automatically (rules in `.claude/rules/` are loaded on every turn).
 
 ## Where to learn more
 
-- **Claude Code basics:** `.claude/reference/claude-platform-capabilities.md` (and Clief Notes PDFs in `docs/teaching/clief-notes/`)
-- **How to adapt this template:** `docs/teaching/how-to-adapt.md`
-- **Anatomy of a CONTEXT.md:** `docs/teaching/context-md-anatomy.md`
-- **Skill integration patterns:** `docs/teaching/skill-integration-patterns.md`
-- **Common mistakes:** `docs/teaching/common-mistakes.md`
-- **Legacy Acme DevRel example** (alternate-domain illustration): `docs/teaching/legacy-devrel-example/`
+- **Claude Code basics:** [`.claude/reference/claude-platform-capabilities.md`](.claude/reference/claude-platform-capabilities.md)
+- **How to adapt this template to another project:** [`docs/teaching/how-to-adapt.md`](docs/teaching/how-to-adapt.md)
+- **Anatomy of a `CONTEXT.md`:** [`docs/teaching/context-md-anatomy.md`](docs/teaching/context-md-anatomy.md)
+- **Skill integration patterns:** [`docs/teaching/skill-integration-patterns.md`](docs/teaching/skill-integration-patterns.md)
+- **Common mistakes:** [`docs/teaching/common-mistakes.md`](docs/teaching/common-mistakes.md)
+- **Bootstrap the scaffold for a new project:** [`docs/teaching/bootstrap.md`](docs/teaching/bootstrap.md)
 
 ## Where to find things FAST
 
 - "I want to plan a feature" → `CONTEXT.md` task table → `spec/CONTEXT.md`
 - "I want to implement a feature" → `build/CONTEXT.md`
-- "I want to investigate something" → `lab/CONTEXT.md`
+- "I want to investigate something (spike)" → `lab/CONTEXT.md`
 - "I want to ship a release" → `ship/CONTEXT.md`
 - "How does the agent loop work?" → `docs/orchestrator-process.md`
 - "How do I configure an MCP?" → `.claude/MCP-SETUP.md`
+- "How does Pitwall actually work?" → `.claude/reference/project-architecture.md`
+- "What's the tech stack?" → `.claude/reference/tech-stack.md`
+- "F1 terminology I don't know?" → `.claude/reference/glossary.md`
