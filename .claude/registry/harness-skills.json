@@ -1,0 +1,272 @@
+[
+  {
+    "name": "claude-automation-recommender",
+    "namespace": "claude-code-setup",
+    "marketplace": "claude-plugins-official",
+    "version": "1.0.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/claude-code-setup/1.0.0/skills/claude-automation-recommender",
+    "description": ""
+  },
+  {
+    "name": "firecrawl-agent",
+    "namespace": "firecrawl",
+    "marketplace": "claude-plugins-official",
+    "version": "1.0.8",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/firecrawl/1.0.8/skills/firecrawl-agent",
+    "description": ""
+  },
+  {
+    "name": "firecrawl-cli",
+    "namespace": "firecrawl",
+    "marketplace": "claude-plugins-official",
+    "version": "1.0.8",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/firecrawl/1.0.8/skills/firecrawl-cli",
+    "description": ""
+  },
+  {
+    "name": "firecrawl-crawl",
+    "namespace": "firecrawl",
+    "marketplace": "claude-plugins-official",
+    "version": "1.0.8",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/firecrawl/1.0.8/skills/firecrawl-crawl",
+    "description": ""
+  },
+  {
+    "name": "firecrawl-download",
+    "namespace": "firecrawl",
+    "marketplace": "claude-plugins-official",
+    "version": "1.0.8",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/firecrawl/1.0.8/skills/firecrawl-download",
+    "description": ""
+  },
+  {
+    "name": "firecrawl-instruct",
+    "namespace": "firecrawl",
+    "marketplace": "claude-plugins-official",
+    "version": "1.0.8",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/firecrawl/1.0.8/skills/firecrawl-instruct",
+    "description": ""
+  },
+  {
+    "name": "firecrawl-map",
+    "namespace": "firecrawl",
+    "marketplace": "claude-plugins-official",
+    "version": "1.0.8",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/firecrawl/1.0.8/skills/firecrawl-map",
+    "description": ""
+  },
+  {
+    "name": "firecrawl-scrape",
+    "namespace": "firecrawl",
+    "marketplace": "claude-plugins-official",
+    "version": "1.0.8",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/firecrawl/1.0.8/skills/firecrawl-scrape",
+    "description": ""
+  },
+  {
+    "name": "firecrawl-search",
+    "namespace": "firecrawl",
+    "marketplace": "claude-plugins-official",
+    "version": "1.0.8",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/firecrawl/1.0.8/skills/firecrawl-search",
+    "description": ""
+  },
+  {
+    "name": "remember",
+    "namespace": "remember",
+    "marketplace": "claude-plugins-official",
+    "version": "0.5.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/remember/0.5.0/skills/remember",
+    "description": ""
+  },
+  {
+    "name": "brainstorming",
+    "namespace": "superpowers",
+    "marketplace": "claude-plugins-official",
+    "version": "5.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/superpowers/5.1.0/skills/brainstorming",
+    "description": ""
+  },
+  {
+    "name": "dispatching-parallel-agents",
+    "namespace": "superpowers",
+    "marketplace": "claude-plugins-official",
+    "version": "5.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/superpowers/5.1.0/skills/dispatching-parallel-agents",
+    "description": ""
+  },
+  {
+    "name": "executing-plans",
+    "namespace": "superpowers",
+    "marketplace": "claude-plugins-official",
+    "version": "5.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/superpowers/5.1.0/skills/executing-plans",
+    "description": ""
+  },
+  {
+    "name": "finishing-a-development-branch",
+    "namespace": "superpowers",
+    "marketplace": "claude-plugins-official",
+    "version": "5.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/superpowers/5.1.0/skills/finishing-a-development-branch",
+    "description": ""
+  },
+  {
+    "name": "receiving-code-review",
+    "namespace": "superpowers",
+    "marketplace": "claude-plugins-official",
+    "version": "5.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/superpowers/5.1.0/skills/receiving-code-review",
+    "description": ""
+  },
+  {
+    "name": "requesting-code-review",
+    "namespace": "superpowers",
+    "marketplace": "claude-plugins-official",
+    "version": "5.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/superpowers/5.1.0/skills/requesting-code-review",
+    "description": ""
+  },
+  {
+    "name": "subagent-driven-development",
+    "namespace": "superpowers",
+    "marketplace": "claude-plugins-official",
+    "version": "5.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/superpowers/5.1.0/skills/subagent-driven-development",
+    "description": ""
+  },
+  {
+    "name": "systematic-debugging",
+    "namespace": "superpowers",
+    "marketplace": "claude-plugins-official",
+    "version": "5.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/superpowers/5.1.0/skills/systematic-debugging",
+    "description": ""
+  },
+  {
+    "name": "test-driven-development",
+    "namespace": "superpowers",
+    "marketplace": "claude-plugins-official",
+    "version": "5.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/superpowers/5.1.0/skills/test-driven-development",
+    "description": ""
+  },
+  {
+    "name": "using-git-worktrees",
+    "namespace": "superpowers",
+    "marketplace": "claude-plugins-official",
+    "version": "5.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/superpowers/5.1.0/skills/using-git-worktrees",
+    "description": ""
+  },
+  {
+    "name": "using-superpowers",
+    "namespace": "superpowers",
+    "marketplace": "claude-plugins-official",
+    "version": "5.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/superpowers/5.1.0/skills/using-superpowers",
+    "description": ""
+  },
+  {
+    "name": "verification-before-completion",
+    "namespace": "superpowers",
+    "marketplace": "claude-plugins-official",
+    "version": "5.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/superpowers/5.1.0/skills/verification-before-completion",
+    "description": ""
+  },
+  {
+    "name": "writing-plans",
+    "namespace": "superpowers",
+    "marketplace": "claude-plugins-official",
+    "version": "5.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/superpowers/5.1.0/skills/writing-plans",
+    "description": ""
+  },
+  {
+    "name": "writing-skills",
+    "namespace": "superpowers",
+    "marketplace": "claude-plugins-official",
+    "version": "5.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "claude-plugins-official/superpowers/5.1.0/skills/writing-skills",
+    "description": ""
+  },
+  {
+    "name": "karpathy-guidelines",
+    "namespace": "andrej-karpathy-skills",
+    "marketplace": "karpathy-skills",
+    "version": "1.0.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "karpathy-skills/andrej-karpathy-skills/1.0.0/skills/karpathy-guidelines",
+    "description": ""
+  },
+  {
+    "name": "mempalace",
+    "namespace": "mempalace",
+    "marketplace": "mempalace",
+    "version": "3.3.3",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "mempalace/mempalace/3.3.3/skills/mempalace",
+    "description": ""
+  },
+  {
+    "name": "building-pydantic-ai-agents",
+    "namespace": "ai",
+    "marketplace": "pydantic-skills",
+    "version": "0.1.0",
+    "kind": "skill",
+    "source": "harness",
+    "plugin_path": "pydantic-skills/ai/0.1.0/skills/building-pydantic-ai-agents",
+    "description": ""
+  }
+]

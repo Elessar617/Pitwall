@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+PROFILE="${BLUEPRINT_HOOK_PROFILE:-standard}"
+[ "$PROFILE" = "minimal" ] && exit 0
 # Hook: block-cycle-overrun.sh
 # Trigger: PreToolUse on Edit | Write when target path is build/workflows/*/03-validate/
 # Behavior: Block if 5 or more review-N.md files already exist in the target dir.

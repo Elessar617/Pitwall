@@ -1,0 +1,30 @@
+[
+  {
+    "name": "filesystem",
+    "kind": "mcp",
+    "source": "harness",
+    "command": "npx",
+    "description": ""
+  },
+  {
+    "name": "git",
+    "kind": "mcp",
+    "source": "harness",
+    "command": "npx",
+    "description": ""
+  },
+  {
+    "name": "fetch",
+    "kind": "mcp",
+    "source": "harness",
+    "command": "npx",
+    "description": ""
+  },
+  {
+    "name": "github",
+    "kind": "mcp",
+    "source": "harness",
+    "command": "npx",
+    "description": ""
+  }
+]

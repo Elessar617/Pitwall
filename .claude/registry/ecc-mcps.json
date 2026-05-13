@@ -1,0 +1,10 @@
+[
+  {
+    "name": "mcp-servers",
+    "kind": "mcp",
+    "source": "ecc",
+    "path": "mcp-configs/mcp-servers.json",
+    "description": "",
+    "ecc_sha": "894ee03930f0e0233b84320ff4af802ec650d706"
+  }
+]

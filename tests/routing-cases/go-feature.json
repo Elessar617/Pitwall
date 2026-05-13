@@ -1,0 +1,14 @@
+{
+  "name": "go-feature-implementation",
+  "input": {
+    "prompt": "add a rate limiter to the gateway service",
+    "files_in_scope": ["gateway/handler.go", "gateway/middleware.go"]
+  },
+  "expected": {
+    "branch": "build",
+    "languages_detected": ["go"],
+    "hook_profile": "standard",
+    "agents_must_include": ["planner", "implementer", "reviewer", "adversary", "go-reviewer", "go-build-resolver"],
+    "skills_must_include": ["tdd-loop", "golang-patterns"]
+  }
+}

@@ -1,34 +1,38 @@
-# Pitwall — Project Map
+# Workspace Blueprint — Map
 
-> **Always loaded.** This file is THE MAP for the Pitwall codebase. It shows every workspace, every key directory, every naming convention. It does NOT contain detailed instructions — those live in workspace `CONTEXT.md` files.
+> **Always loaded.** This file is THE MAP. It shows every workspace, every key directory, every naming convention. It does NOT contain detailed instructions — those live in workspace `CONTEXT.md` files.
 
 ## What This Repo Is
 
-**Pitwall** is a terminal-UI companion for Formula 1: live timing + real-time track-position map during sessions (FP1-3 / Quali / Sprint Quali / Sprint / Race), a season tracker (schedule / standings / results / driver and constructor profiles), and a strategy mini-game played alongside an in-progress race (commit a tyre + pit plan pre-race, react to pit-window prompts mid-race, score yourself against the actual driver outcome).
+An agent-native scaffold for software development work. Two roles:
+1. **An active lab** — numbered iterations live here for ongoing software experiments, features, bug investigations, and refactors.
+2. **The canonical scaffolding source** — the directory layout and markdown templates are domain-agnostic enough to copy into other repos. See `.claude/MCP-SETUP.md` and `START-HERE.md` for bootstrap.
 
-It's built **on top of the workspace-blueprint scaffold** — an agent-native template for development. The scaffold provides the workspaces (`spec/`, `lab/`, `build/`, `ship/`), the four-agent build loop (planner → implementer ↔ reviewer ↔ adversary), and the `.claude/` infrastructure. If you want to use the same scaffold for a different project, see [`docs/teaching/bootstrap.md`](docs/teaching/bootstrap.md).
-
-The instruction layer (`CLAUDE.md`, `CONTEXT.md`, `.claude/rules/`, `.claude/skills/`, all workspace `CONTEXT.md` files) is **portable** — domain-agnostic by construction. F1-specific facts live only in `.claude/reference/`.
+The instruction layer (`CLAUDE.md`, `CONTEXT.md`, `.claude/`, all workspace `CONTEXT.md` files) is portable. Project-specific facts live only in `.claude/reference/`.
 
 ---
+
+## Auto-routing
+
+Before starting any task, agents consult `ROUTING.md` (the markdown decision tree) and the matching branch file under `.claude/routing/`. The tree narrows which agents, skills, commands, MCPs, and hook profile apply. Names resolve via `.claude/registry/*.json`. See spec at `docs/superpowers/specs/2026-05-11-ecc-bridge-and-routing-design.md`.
 
 ## Folder Structure
 
 ```
-pitwall/
+workspace-blueprint/
 ├─ CLAUDE.md             ← you are here (THE MAP, always loaded)
 ├─ CONTEXT.md            ← Layer 2: top-level ROUTER (read this for task routing)
-├─ START-HERE.md         ← onboarding for contributors
+├─ START-HERE.md         ← onboarding for humans new to this repo
 ├─ README.md             ← public-facing repo description
 │
 ├─ .claude/              ← cross-cutting agent infrastructure
 │  ├─ rules/             ← always-loaded constraints (LEAN, <40KB)
 │  ├─ skills/            ← on-demand procedures (10 skills: 6 project + 4 office)
 │  ├─ agents/            ← planner, implementer, reviewer, adversary specs
-│  ├─ reference/         ← looked up on demand (F1 + Pitwall facts live here)
+│  ├─ reference/         ← looked up on demand (project + portable references)
 │  ├─ hooks/             ← four bash hooks enforcing rules by construction
 │  ├─ settings.json      ← wires hooks, plugins, MCP servers
-│  ├─ .portability-deny.txt   ← deny list for the portability hook (F1 terms)
+│  ├─ .portability-deny.txt   ← deny list for the portability hook
 │  └─ MCP-SETUP.md       ← post-clone setup: plugins + GitHub PAT
 │
 ├─ spec/                 ← WORKSPACE: pre-build artifacts (RFCs, ADRs, briefs)
@@ -36,16 +40,13 @@ pitwall/
 ├─ build/                ← WORKSPACE: production pipeline (workflows/NN-slug/)
 ├─ ship/                 ← WORKSPACE: release artifacts (docs, changelog, deploy)
 │
-├─ shared/               ← reusable infrastructure (logging, config, error types)
-├─ src/pitwall/          ← long-lived production source code (the TUI)
+├─ shared/               ← reusable infrastructure (the 60% layer)
+├─ src/                  ← long-lived production source code
 ├─ scripts/              ← repo utilities
-├─ data/                 ← runtime data (SQLite cache, tyre-deg curves, circuits)
-├─ faceoff/              ← reference: NHL TUI we draw structural inspiration from
 │
 └─ docs/                 ← meta docs about this repo's process
    ├─ explorations/      ← numbered post-mortems from completed iterations
    ├─ iteration-process.md, orchestrator-process.md
-   ├─ teaching/          ← scaffold story; bootstrap recipe; how to adapt
    └─ superpowers/{specs,plans}/  ← design specs and implementation plans
 ```
 
@@ -114,19 +115,19 @@ Cycle cap: 5 (hook-enforced). Sign-off required for `04-output/` (hook-enforced)
 
 ## Skills, Plugins, MCPs
 
-- **10 skills** in `.claude/skills/` — 6 project-specific (tdd-loop, bug-investigation, refactor-protocol, spike-protocol, spec-authoring, data-analysis) + 4 office (docx, pptx, xlsx, pdf vendored from `anthropics/skills`)
-- **Plugins** enabled (user scope): `obra/superpowers`, `affaan-m/everything-claude-code`, `karpathy-skills/andrej-karpathy-skills` (style + discipline), `pydantic/skills` (`ai` — Pydantic-AI helper)
+- **14 skills** in `.claude/skills/` — 6 project-specific (tdd-loop, bug-investigation, refactor-protocol, spike-protocol, spec-authoring, data-analysis) + 4 office (docx, pptx, xlsx, pdf vendored from `anthropics/skills`) + 4 routing-vendored (systematic-debugging, writing-plans, brainstorming, karpathy-guidelines — MIT-attributed in `.claude/skills/THIRD_PARTY_LICENSES.md`, refreshed via `npm run refresh-vendored`)
+- **2 plugins** enabled: `obra/superpowers` and `affaan-m/everything-claude-code`
 - **4 MCP servers** configured: `filesystem`, `git`, `fetch` (credential-free), `github` (placeholder env var)
 
-Setup details: `.claude/MCP-SETUP.md`. Catalogs: `.claude/reference/{mcp-servers,external-resources}.md`.
+Setup details: `.claude/MCP-SETUP.md`. Catalogs: `.claude/reference/{mcp-servers,external-resources}.md`. **Human-readable inventory of routing-referenced items**: `SKILLS.md` at repo root.
 
 ---
 
 ## Portability Discipline
 
-This repo is **a project** (Pitwall) **built on a portable scaffold**. Files in `.claude/rules/` and `.claude/skills/` (except vendored office skills) MUST stay domain-agnostic — they get reused if anyone bootstraps a new repo from this scaffold. F1-specific facts (tyre compounds, DRS, FastF1, OpenF1, Jolpica, etc.) live ONLY in `.claude/reference/`, which a consumer rewrites. The `enforce-portability.sh` hook + `.claude/.portability-deny.txt` enforce this mechanically — the deny list contains the active F1 terms.
+This repo is the canonical scaffold for OTHER repos. Files in `.claude/rules/` and `.claude/skills/` (except vendored office skills) MUST stay domain-agnostic. Project-specific facts live ONLY in `.claude/reference/` (which the consumer rewrites). The `enforce-portability.sh` hook + `.claude/.portability-deny.txt` enforce this mechanically.
 
-Bootstrap procedure for using this scaffold in another repo: see [`docs/teaching/bootstrap.md`](docs/teaching/bootstrap.md).
+Bootstrap procedure for using this scaffold in another repo: see `START-HERE.md`.
 
 ---
 

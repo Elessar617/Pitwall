@@ -1,0 +1,306 @@
+[
+  {
+    "name": "adversary",
+    "kind": "agent",
+    "source": "native",
+    "description": "Tries to break the implementer's work — finds edge cases, attack surfaces, performance cliffs, race conditions. Writes findings to 03-validate/adversary-N.md. Runs in parallel with the reviewer each cycle.",
+    "languages": [],
+    "tools": [
+      "Read",
+      "Bash",
+      "Grep",
+      "Glob",
+      "Edit",
+      "Write"
+    ],
+    "model": null,
+    "path": ".claude/agents/adversary-agent.md"
+  },
+  {
+    "name": "implementer",
+    "kind": "agent",
+    "source": "native",
+    "description": "Writes production code in src/ to satisfy a SPEC.md. Reads the SPEC and the latest reviewer + adversary findings each cycle. Code goes to src/; process notes to 02-implement/.",
+    "languages": [],
+    "tools": [
+      "Read",
+      "Write",
+      "Edit",
+      "Bash",
+      "Grep",
+      "Glob"
+    ],
+    "model": null,
+    "path": ".claude/agents/implementer-agent.md"
+  },
+  {
+    "name": "planner",
+    "kind": "agent",
+    "source": "native",
+    "description": "One-shot agent that converts a spec/ source artifact (RFC, ADR, brief, or lab REPORT) into a buildable SPEC.md for an iteration in build/workflows/. Does NOT implement. Exits after producing SPEC.md.",
+    "languages": [],
+    "tools": [
+      "Read",
+      "Write",
+      "Edit",
+      "Bash",
+      "Grep",
+      "Glob"
+    ],
+    "model": null,
+    "path": ".claude/agents/planner-agent.md"
+  },
+  {
+    "name": "reviewer",
+    "kind": "agent",
+    "source": "native",
+    "description": "Reviews the implementer's diff against the SPEC.md acceptance criteria and the .claude/rules/. Writes verdict + findings to 03-validate/review-N.md. Runs in parallel with the adversary each cycle.",
+    "languages": [],
+    "tools": [
+      "Read",
+      "Bash",
+      "Grep",
+      "Glob"
+    ],
+    "model": null,
+    "path": ".claude/agents/reviewer-agent.md"
+  },
+  {
+    "name": "brainstorming",
+    "kind": "skill",
+    "source": "native",
+    "description": "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation.",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/skills/brainstorming/SKILL.md"
+  },
+  {
+    "name": "bug-investigation",
+    "kind": "skill",
+    "source": "native",
+    "description": "Use when starting work on a reported bug or unexpected behavior. Enforces reproduce-before-fix and root-cause-before-patch. Drives a build/ iteration whose 01-spec/ is the diagnosis, not a feature plan.",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/skills/bug-investigation/SKILL.md"
+  },
+  {
+    "name": "data-analysis",
+    "kind": "skill",
+    "source": "native",
+    "description": "Use when the work involves analyzing data, computing statistics, or producing visualizations from data files. Encodes the trigger phrasing for code-execution that yields better results.",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/skills/data-analysis/SKILL.md"
+  },
+  {
+    "name": "docx",
+    "kind": "skill",
+    "source": "native",
+    "description": "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. When Claude needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/skills/docx/SKILL.md"
+  },
+  {
+    "name": "karpathy-guidelines",
+    "kind": "skill",
+    "source": "native",
+    "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/skills/karpathy-guidelines/SKILL.md"
+  },
+  {
+    "name": "pdf",
+    "kind": "skill",
+    "source": "native",
+    "description": "Comprehensive PDF manipulation toolkit for extracting text and tables, creating new PDFs, merging/splitting documents, and handling forms. When Claude needs to fill in a PDF form or programmatically process, generate, or analyze PDF documents at scale.",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/skills/pdf/SKILL.md"
+  },
+  {
+    "name": "pptx",
+    "kind": "skill",
+    "source": "native",
+    "description": "Presentation creation, editing, and analysis. When Claude needs to work with presentations (.pptx files) for: (1) Creating new presentations, (2) Modifying or editing content, (3) Working with layouts, (4) Adding comments or speaker notes, or any other presentation tasks",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/skills/pptx/SKILL.md"
+  },
+  {
+    "name": "refactor-protocol",
+    "kind": "skill",
+    "source": "native",
+    "description": "Use when undertaking a refactor, framework upgrade, or migration that changes structure without changing behavior. Enforces blast-radius analysis and behavior-equivalence proof.",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/skills/refactor-protocol/SKILL.md"
+  },
+  {
+    "name": "spec-authoring",
+    "kind": "skill",
+    "source": "native",
+    "description": "Use when authoring an RFC, ADR, or brief in spec/. Defines the shape each artifact must take so the planner agent can consume it cleanly into 01-spec/SPEC.md.",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/skills/spec-authoring/SKILL.md"
+  },
+  {
+    "name": "spike-protocol",
+    "kind": "skill",
+    "source": "native",
+    "description": "Use when starting an exploratory iteration in lab/. Drives the PREFLIGHT → prototype → VERIFY → REPORT shape. Output is a learning, not shipped code.",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/skills/spike-protocol/SKILL.md"
+  },
+  {
+    "name": "systematic-debugging",
+    "kind": "skill",
+    "source": "native",
+    "description": "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/skills/systematic-debugging/SKILL.md"
+  },
+  {
+    "name": "tdd-loop",
+    "kind": "skill",
+    "source": "native",
+    "description": "Use when implementing any feature, bug fix, or refactor in the build/ pipeline. Enforces test-first discipline as a tight red→green→refactor cycle. Mandatory for the implementer agent (per testing-discipline rule).",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/skills/tdd-loop/SKILL.md"
+  },
+  {
+    "name": "writing-plans",
+    "kind": "skill",
+    "source": "native",
+    "description": "Use when you have a spec or requirements for a multi-step task, before touching code",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/skills/writing-plans/SKILL.md"
+  },
+  {
+    "name": "xlsx",
+    "kind": "skill",
+    "source": "native",
+    "description": "Comprehensive spreadsheet creation, editing, and analysis with support for formulas, formatting, data analysis, and visualization. When Claude needs to work with spreadsheets (.xlsx, .xlsm, .csv, .tsv, etc) for: (1) Creating new spreadsheets with formulas and formatting, (2) Reading or analyzing data, (3) Modify existing spreadsheets while preserving formulas, (4) Data analysis and visualization in spreadsheets, or (5) Recalculating formulas",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/skills/xlsx/SKILL.md"
+  },
+  {
+    "name": "code-quality",
+    "kind": "rule",
+    "source": "native",
+    "description": "# Rule: Code quality",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/rules/code-quality.md"
+  },
+  {
+    "name": "commit-discipline",
+    "kind": "rule",
+    "source": "native",
+    "description": "# Rule: Commit discipline",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/rules/commit-discipline.md"
+  },
+  {
+    "name": "nasa-power-of-10",
+    "kind": "rule",
+    "source": "native",
+    "description": "# Rule: NASA Power of 10 (when applicable)",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/rules/nasa-power-of-10.md"
+  },
+  {
+    "name": "portability-discipline",
+    "kind": "rule",
+    "source": "native",
+    "description": "# Rule: Portability discipline",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/rules/portability-discipline.md"
+  },
+  {
+    "name": "review-discipline",
+    "kind": "rule",
+    "source": "native",
+    "description": "# Rule: Review discipline (multi-agent gate)",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/rules/review-discipline.md"
+  },
+  {
+    "name": "testing-discipline",
+    "kind": "rule",
+    "source": "native",
+    "description": "# Rule: Testing discipline (TDD mandatory)",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/rules/testing-discipline.md"
+  },
+  {
+    "name": "unix-philosophy",
+    "kind": "rule",
+    "source": "native",
+    "description": "# Rule: Unix philosophy (when applicable)",
+    "languages": [],
+    "tools": [],
+    "model": null,
+    "path": ".claude/rules/unix-philosophy.md"
+  },
+  {
+    "name": "filesystem",
+    "kind": "mcp",
+    "source": "native",
+    "command": "npx",
+    "description": ""
+  },
+  {
+    "name": "git",
+    "kind": "mcp",
+    "source": "native",
+    "command": "npx",
+    "description": ""
+  },
+  {
+    "name": "fetch",
+    "kind": "mcp",
+    "source": "native",
+    "command": "npx",
+    "description": ""
+  },
+  {
+    "name": "github",
+    "kind": "mcp",
+    "source": "native",
+    "command": "npx",
+    "description": ""
+  }
+]

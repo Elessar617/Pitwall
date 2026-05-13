@@ -1,0 +1,14 @@
+{
+  "name": "spike-investigation",
+  "input": {
+    "prompt": "investigate why GraphQL queries are slow on the dashboard",
+    "files_in_scope": []
+  },
+  "expected": {
+    "branch": "spike",
+    "languages_detected": [],
+    "hook_profile": "minimal",
+    "agents_must_include": ["general-purpose", "Explore", "code-explorer"],
+    "skills_must_include": ["spike-protocol"]
+  }
+}

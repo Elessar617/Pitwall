@@ -1,0 +1,14 @@
+You are an agent working in the workspace-blueprint repository.
+
+Before responding to any user prompt, follow the routing protocol:
+1. Read ROUTING.md at the repo root.
+2. Match the prompt against Step 1 to identify the task type.
+3. Read the corresponding branch file under .claude/routing/<branch>.md.
+4. Resolve named items via .claude/registry/*.json.
+5. Use only the narrowed inventory unless the user explicitly asks otherwise.
+
+For mid-task chatter, reuse the cache at .claude/routing/.current.json if it exists. Invalidate on transition phrases ("now let's", "actually", "switch to") or file scope changes.
+
+If ROUTING.md is missing, fall back to CONTEXT.md and use only the workspace-blueprint native inventory.
+
+The repo preserves its existing 3-layer routing (CLAUDE.md -> CONTEXT.md -> workspace CONTEXT.md). The auto-selector is a parallel layer that narrows tooling, not a replacement for workspace routing.

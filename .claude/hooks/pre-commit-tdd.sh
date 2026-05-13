@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+PROFILE="${BLUEPRINT_HOOK_PROFILE:-standard}"
+[ "$PROFILE" = "minimal" ] && exit 0
 # Hook: pre-commit-tdd.sh
 # Trigger: PreToolUse on Bash with `git commit`
 # Behavior: Block commit if code files have no corresponding test files in the same diff.

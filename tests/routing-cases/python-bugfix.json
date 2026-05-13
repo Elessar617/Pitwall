@@ -1,0 +1,14 @@
+{
+  "name": "python-bugfix",
+  "input": {
+    "prompt": "fix the broken JSON parsing in api/parser.py",
+    "files_in_scope": ["api/parser.py", "api/parser_test.py"]
+  },
+  "expected": {
+    "branch": "bug",
+    "languages_detected": ["python"],
+    "hook_profile": "standard",
+    "agents_must_include": ["implementer", "reviewer", "python-reviewer"],
+    "skills_must_include": ["bug-investigation", "tdd-loop"]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "ecc_path_default": "${REPO_ROOT}/external/ecc",
+  "env_override_key": "ECC_PATH",
+  "scrape_subdirs": ["agents", "skills", "commands", "mcp-configs", "rules"],
+  "_note": "ECC_PATH env var overrides ecc_path_default at scrape time."
+}

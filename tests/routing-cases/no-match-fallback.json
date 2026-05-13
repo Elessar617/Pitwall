@@ -1,0 +1,13 @@
+{
+  "name": "no-match-fallback",
+  "input": {
+    "prompt": "thanks for that!",
+    "files_in_scope": []
+  },
+  "expected": {
+    "branch": "fallback",
+    "hook_profile": "standard",
+    "agents_must_include": ["planner", "implementer", "reviewer", "adversary"],
+    "skills_must_include": ["tdd-loop"]
+  }
+}

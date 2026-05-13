@@ -1,6 +1,6 @@
 # Workspace Blueprint — Task Router
 
-> **Layer 2: THE ROUTER.** Routes you to the right workspace based on what you're doing. The Clief Notes §4.1 decision sequence is embedded below.
+> **Layer 2: THE ROUTER.** Routes you to the right workspace based on what you're doing.
 
 ## What This Is
 
@@ -8,13 +8,13 @@ This file does ONE job: route to the right workspace + tell you what to load. De
 
 ---
 
-## The Decision Sequence (Clief Notes §4.1)
+## The Decision Sequence
 
 When starting a task, ask in order:
 
 1. **Need persistent project context?** Yes → CLAUDE.md is auto-loaded; consult `.claude/reference/project-architecture.md` if needed. No → proceed.
 2. **Need external data?** Yes → use the configured MCP servers (`filesystem`, `git`, `fetch`, `github`); see `.claude/reference/mcp-servers.md` for more. No → proceed.
-3. **Repeatable process?** Yes → use a skill from `.claude/skills/` (10 available). No → prompt directly.
+3. **Repeatable process?** Yes → use a skill from `.claude/skills/`. No → prompt directly.
 4. **What's the output format?**
    - File (`.docx`, `.pptx`, `.xlsx`, `.pdf`) → `.claude/skills/{docx,pptx,xlsx,pdf}/`
    - Code → goes in `src/` (work flows through `build/`)
@@ -39,7 +39,7 @@ When starting a task, ask in order:
 | **Write user-facing docs** | `ship/CONTEXT.md` | `.claude/reference/tech-stack.md`, the relevant `04-output/OUTPUT.md` |
 | **Generate a release artifact** (`.docx`, `.pdf`, etc.) | `ship/CONTEXT.md` | `.claude/skills/{docx,pdf,pptx,xlsx}/SKILL.md` (whichever applies) |
 | **Author release notes** | `ship/CONTEXT.md` | `ship/changelog/`, recent `04-output/OUTPUT.md` files |
-| **Bootstrap THIS scaffold into another repo** | `docs/teaching/bootstrap.md` | `.claude/MCP-SETUP.md` |
+| **Bootstrap THIS scaffold into another repo** | `START-HERE.md` | `.claude/MCP-SETUP.md` |
 
 ---
 
@@ -78,5 +78,4 @@ lab/  ──┘     │
 - **Project-specific reference (consumer fills in):** `.claude/reference/`
 - **External resource catalog:** `.claude/reference/{mcp-servers,external-resources}.md`
 - **End-to-end process:** `docs/iteration-process.md`, `docs/orchestrator-process.md`
-- **How to adapt this scaffold:** `docs/teaching/`
-- **The Clief Notes source PDFs:** `docs/teaching/clief-notes/`
+- **Local-only maintainer reference material:** ignored when present

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+PROFILE="${BLUEPRINT_HOOK_PROFILE:-standard}"
+[ "$PROFILE" = "minimal" ] && exit 0
 # Hook: block-output-without-signoff.sh
 # Trigger: PreToolUse on Edit | Write when target path is build/workflows/*/04-output/
 # Behavior: Block unless latest review-N.md has verdict: pass AND latest adversary-N.md

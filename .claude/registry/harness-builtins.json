@@ -1,0 +1,20 @@
+[
+  {
+    "name": "general-purpose",
+    "kind": "agent",
+    "source": "harness-builtin",
+    "description": "Generic Claude Code subagent type."
+  },
+  {
+    "name": "Explore",
+    "kind": "agent",
+    "source": "harness-builtin",
+    "description": "Claude Code exploration subagent."
+  },
+  {
+    "name": "Plan",
+    "kind": "agent",
+    "source": "harness-builtin",
+    "description": "Claude Code planning subagent."
+  }
+]

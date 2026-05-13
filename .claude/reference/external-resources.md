@@ -1,6 +1,6 @@
 # External Resources
 
-Curated resources for working with Claude (Code, API, plugins). Sourced from the Clief Resource Index (`docs/teaching/clief-notes/resource_index.pdf`).
+Curated resources for working with Claude (Code, API, plugins).
 
 ## Official Anthropic
 

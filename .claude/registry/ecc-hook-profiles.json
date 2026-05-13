@@ -1,0 +1,20 @@
+[
+  {
+    "name": "minimal",
+    "kind": "hook-profile",
+    "source": "native",
+    "description": "Hooks no-op; exit 0 immediately."
+  },
+  {
+    "name": "standard",
+    "kind": "hook-profile",
+    "source": "native",
+    "description": "Current hook behavior (default)."
+  },
+  {
+    "name": "strict",
+    "kind": "hook-profile",
+    "source": "native",
+    "description": "Current behavior plus future stricter variants."
+  }
+]

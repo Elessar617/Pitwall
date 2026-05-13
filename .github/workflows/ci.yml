@@ -1,0 +1,52 @@
+# Cleanroom CI — mirrors the manual fresh-clone validation done 2026-05-12.
+#
+# Security note: this workflow does NOT interpolate any github.event.* fields
+# (issue titles, PR descriptions, commit messages, branch names) into `run:`
+# commands. Every `run:` step calls a fixed-name script with no operator-
+# controllable arguments. There is no command-injection surface.
+#
+# What this verifies on every push/PR:
+#   1. bootstrap.sh self-initializes the ECC submodule from upstream
+#      (we deliberately do NOT use --recursive at checkout, so bootstrap's
+#      submodule-recovery path is exercised, not bypassed)
+#   2. npm install succeeds on a clean machine
+#   3. rebuild-registry produces clean output (no dangling references in
+#      ROUTING.md / .claude/routing/*.md — the strict validator from
+#      audit-fix 1bbb3b3 hard-fails the rebuild if any reference dangles)
+#   4. npm test passes: unit + hook + integration tiers
+#
+# What this does NOT verify (intentional v1 scope):
+#   - Cross-IDE agent compliance (full F1, still trigger-gated)
+#   - Byte-equality of the harness registry portions (machine-specific by
+#     design per spec §6.1; CI runner has no installed Claude Code plugins)
+#
+# References: docs/limitations-and-deferred.md §2 "Cleanroom CI";
+# docs/development-log.md §4.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  cleanroom:
+    name: Cleanroom bootstrap + tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout (without submodules — bootstrap.sh self-inits)
+        uses: actions/checkout@v4
+
+      - name: Set up Node 20 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Bootstrap (submodule init + npm install + rebuild registries)
+        run: ./scripts/bootstrap.sh
+
+      - name: Run full test suite (unit + hook + integration)
+        run: npm test

@@ -1,0 +1,13 @@
+{
+  "name": "mixed-language",
+  "input": {
+    "prompt": "implement the cross-stack auth flow",
+    "files_in_scope": ["backend/auth.py", "frontend/login.tsx"]
+  },
+  "expected": {
+    "branch": "build",
+    "languages_detected_must_include": ["python", "typescript"],
+    "hook_profile": "standard",
+    "agents_must_include": ["python-reviewer", "typescript-reviewer"]
+  }
+}

@@ -1,6 +1,6 @@
 # Claude Platform Capabilities
 
-This file summarizes Claude's capabilities outside Claude Code (Projects, Memory, etc.), and the cross-platform decision sequence. Sourced from the Clief Notes Skills Field Manual (`docs/teaching/clief-notes/skills_field_manual.pdf`, §1, §5, §4.1).
+This file summarizes Claude's capabilities outside Claude Code (Projects, Memory, etc.), and the cross-platform decision sequence.
 
 This repo is Claude Code-first; this file exists so the agent (and you) know what other Claude surfaces exist and when they're appropriate.
 
@@ -22,7 +22,7 @@ Cross-conversation personalization. Memory is account-scoped, applies outside Pr
 
 **For Claude Code:** the equivalent is `~/.claude/projects/<repo-path>/memory/` — a file-based memory system Claude Code maintains. Different mechanism, same goal.
 
-## The decision sequence (Clief §4.1)
+## The decision sequence
 
 When starting any task on any Claude surface, run through these in order:
 

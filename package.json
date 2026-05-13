@@ -1,0 +1,17 @@
+{
+  "name": "workspace-blueprint",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Workspace blueprint with ECC bridge - not published",
+  "engines": { "node": ">=18.0.0" },
+  "scripts": {
+    "rebuild-registry": "node scripts/rebuild-registry.mjs",
+    "rebuild-harness": "node scripts/rebuild-registry.mjs --harness-only",
+    "refresh-vendored": "node scripts/refresh-vendored.mjs",
+    "test": "node tests/run.mjs",
+    "test:unit": "node --test tests/unit/*.test.mjs"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3"
+  }
+}

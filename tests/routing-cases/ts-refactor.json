@@ -1,0 +1,14 @@
+{
+  "name": "ts-refactor",
+  "input": {
+    "prompt": "refactor the auth middleware to use the new session API",
+    "files_in_scope": ["src/auth/middleware.ts", "src/auth/session.ts"]
+  },
+  "expected": {
+    "branch": "refactor",
+    "languages_detected": ["typescript"],
+    "hook_profile": "standard",
+    "agents_must_include": ["planner", "implementer", "reviewer", "adversary", "typescript-reviewer"],
+    "skills_must_include": ["tdd-loop"]
+  }
+}

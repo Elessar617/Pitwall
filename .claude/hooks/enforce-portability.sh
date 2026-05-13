@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+PROFILE="${BLUEPRINT_HOOK_PROFILE:-standard}"
+[ "$PROFILE" = "minimal" ] && exit 0
 # Hook: enforce-portability.sh
 # Trigger: PostToolUse on Edit | Write when target path is .claude/rules/ or .claude/skills/
 # Behavior: Grep the file content against .claude/.portability-deny.txt; fail if any
