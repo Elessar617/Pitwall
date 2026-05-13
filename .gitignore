@@ -39,3 +39,6 @@ data/*.db-journal
 
 # External reference repo (separately maintained, cloned alongside if needed)
 faceoff/
+
+# Temporary migration scratch (created/deleted within a single iteration)
+.migration-scratch/
