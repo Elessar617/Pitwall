@@ -54,6 +54,9 @@ uv build                 # produce wheel + sdist
 
 See [`START-HERE.md`](START-HERE.md) for contributor onboarding and the layout of the four-workspace agent-native development scaffold this repo uses.
 
+Agent scaffold snapshot:
+- 14 skills (6 project-specific, 4 office, 4 routing-vendored) live under `.claude/skills/`; see [`SKILLS.md`](SKILLS.md) for the routing inventory.
+
 ## Cloning on a new machine
 
 ```bash

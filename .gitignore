@@ -9,6 +9,12 @@ yarn-error.log
 # Visual companion / brainstorm artifacts
 .superpowers/
 
+# Pitwall runtime data caches (the data/ directory is tracked via .gitkeep)
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+data/*.db-journal
+
 # Local-only maintainer reference materials
 docs/t[e]aching/
 docs/superpowers/plans/2026-05-10-workspace-blueprint-software-redesign.md

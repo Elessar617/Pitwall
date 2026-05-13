@@ -25,27 +25,27 @@ Filled in during Phase F verification. Pass/Fail/N/A per gate per the 16 success
 | 5. Portability hook rejects synthetic F1-term-in-rules edit (exit=1) | Pass | 2026-05-12 |
 | 6. TDD hook rejects new-code-without-test commit (exit=1) | Pass | 2026-05-12 |
 | 7. `src/pitwall/` untouched (0 lines diff vs main) | Pass | 2026-05-12 |
-| 8. `data/` content untouched | Pass-with-note | 2026-05-12 |
+| 8. `data/` content untouched | Pass | 2026-05-13 |
 | 9. `lab/01-openf1-feed-eval/` untouched (0 lines diff vs main) | Pass | 2026-05-12 |
 | 10. `shared/` untouched (0 lines diff vs main) | Pass | 2026-05-12 |
 | 11. F1 reference content present (grep verification: 8 hits) | Pass | 2026-05-12 |
 | 12. Portability preserved (0 F1 hits in rules/non-vendored skills) | Pass | 2026-05-12 |
 | 13. F1 replay checklist 100% cleared (16/16 ticked before scratch deletion) | Pass | 2026-05-12 |
 | 14. Pitwall dev customizations preserved (`_mcpServersNote` + 16 `claude mcp add` refs) | Pass | 2026-05-12 |
-| 15. 21 commits on branch (one more than spec's "22" — see notes below) | Pass | 2026-05-12 |
+| 15. Commit history is one logical change per commit (27 total branch commits; see notes) | Pass-with-note | 2026-05-13 |
 | 16. No mega-commits except B1 (intentional wholesale overlay) | Pass | 2026-05-12 |
 
 **Notes on gates:**
 
-- **Gate 8 ("data/ untouched"):** `data/telemetry.db` (empty file) appears as a new tracked file vs `main`. The file existed on disk pre-resync but was ignored by Pitwall's old `.gitignore` (`data/*.db` pattern). The maintainer's curated post-B1 `.gitignore` deliberately OMITTED the `data/*.db` patterns, so the file is now tracked. The data was not modified; only its tracking status changed, per maintainer intent.
-- **Gate 15 ("22 commits"):** Actual commit count is 21, not 22. The plan's count assumed C13 (settings.json), C14 (settings.local.json), and C15 (MCP-SETUP.md) would produce 3 separate commits. C14 was a documented no-op (gitignored per-user file). The "missing 22nd" commit is offset by the mid-iteration fix-up commit `ffdb14a` (architectural reconciliation for the mcpServers/routing-validator conflict), giving 21 instead of 22. Net result: same audit trail, one fewer no-op + one more meaningful fix.
+- **Gate 8 ("data/ untouched"):** reviewer re-check on 2026-05-13 caught an accidental tracked empty `data/telemetry.db` plus the missing `data/*.db` ignore rules. The tracked empty DB was removed and the runtime-cache ignore patterns were restored, so `data/` now matches `main` again except for the intentionally tracked `.gitkeep`.
+- **Gate 15 ("22 commits"):** actual branch count is 27 from `main` at readiness. The count includes 4 planning/spec commits before implementation plus the reviewer corrective commit after Phase F. This differs from the original 22-commit implementation estimate, but the audit trail is still one logical change per commit and the only intentionally large commit remains B1, the wholesale overlay.
 
 ---
 
 ## Iteration history (newest first)
 
 ### Iteration 1: Resync scaffold with workspace-blueprint
-- **Status:** in-progress (all 16 verification gates passed; ready for push + PR)
+- **Status:** in-progress (all 16 verification gates passed after reviewer re-check; ready for push + PR)
 - **Branch:** `chore/blueprint-resync`
 - **Spec:** [`docs/superpowers/specs/2026-05-12-blueprint-resync-design.md`](docs/superpowers/specs/2026-05-12-blueprint-resync-design.md) (commit `4763e7e`)
 - **Adversary review:** [`docs/superpowers/specs/2026-05-12-blueprint-resync-adversary-review.md`](docs/superpowers/specs/2026-05-12-blueprint-resync-adversary-review.md) (commit `9fd3ef8`)
@@ -53,7 +53,7 @@ Filled in during Phase F verification. Pass/Fail/N/A per gate per the 16 success
 - **PR:** *(URL after `gh pr create` in Phase F)*
 - **Started:** 2026-05-12
 - **Merged:** *(date)*
-- **Commits in branch:** 19 so far (~22 expected at PR open)
+- **Commits in branch:** 27 at PR-open readiness
 - **Cycles consumed:** 1/5 (no review-N.md / adversary-N.md cycle was used; this is a planner-driven iteration, not a `build/workflows/` iteration)
 - **What landed (Phases A–E):**
   - Phase A: branch + snapshot + remove empty workflow placeholders (3 commits)
@@ -67,6 +67,7 @@ Filled in during Phase F verification. Pass/Fail/N/A per gate per the 16 success
   - Phase D2: registry rebuild (no-op — registry was already up-to-date after the fix-up).
   - Phase D3: scratch directory deleted (working-tree-only; `.gitignore` entry preserved for future migrations).
   - Phase E: this `DEVELOPMENT.md` plus `docs/development-philosophy.md` (2 commits).
+  - **Reviewer readiness fix-up:** restored `data/*.db` ignore rules, removed accidental tracked empty `data/telemetry.db`, adapted the inherited source-of-truth test to Pitwall's tracked scaffold docs, and refreshed stale hook/skill-count docs.
 - **What did NOT land (deferred):**
   - Wiring new skills (`brainstorming`, `writing-plans`, `systematic-debugging`, `karpathy-guidelines`) into Pitwall's iteration workflow conventions.
   - GitHub Actions behavior tuning (the workflows were adopted via rsync; behavior tuning is a follow-up).

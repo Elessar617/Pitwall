@@ -90,7 +90,7 @@ Most of what happened on day 2 was *correctness work* — closing gaps the day-1
 | **Registries** | 60 ECC agents + 323 skills + 75 commands + 1 MCP + 105 lang-rules + 3 hook-profiles + 3 built-ins + 29 native records. Harness plugin counts are machine-specific and refreshed from the local operator cache. Byte-stable across rebuilds for the portable sources. |
 | **Tests** | 50 unit + 2 hook + 1 bootstrap-idempotency + 8 with-profile integration tests. 0 failures. |
 | **Rules** | 7 native, all generic (portability hook excludes nothing under `.claude/rules/`). |
-| **Hooks** | 4 enforcement hooks, each gated by `BLUEPRINT_HOOK_PROFILE`. |
+| **Hooks** | 5 hooks total: 4 enforcement hooks gated by `BLUEPRINT_HOOK_PROFILE`, plus `route-inject.sh` for prompt-time routing context. |
 | **Skills** | 14 local skills (6 project + 4 vendored office + 4 routing-vendored). |
 | **Bootstrap path** | Verified end-to-end via cleanroom test on 2026-05-12 (clone without `--recursive` → bootstrap self-recovers → all green). |
 | **Iteration workspaces** | `spec/`, `lab/`, `build/workflows/`, `ship/` exist but contain only templates and `.gitkeep`s — **by design**. The scaffold is the deliverable, not the iterations. |

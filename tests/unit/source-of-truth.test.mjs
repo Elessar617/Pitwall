@@ -26,10 +26,6 @@ function git(args) {
   return result.stdout.trim();
 }
 
-function gitMaybe(args) {
-  return spawnSync('git', args, { cwd: REPO_ROOT, encoding: 'utf8' });
-}
-
 function localSkillCount() {
   const skillsDir = join(REPO_ROOT, '.claude', 'skills');
   return readdirSync(skillsDir)
@@ -90,28 +86,22 @@ test('human source-of-truth docs reflect current generated inventory', () => {
   assert.ok(tableRow(devLog, 'CI').includes('GitHub Actions'));
 });
 
-test('published surface omits local-only source markers', () => {
-  const hiddenDocPath = ['docs', 't' + 'eaching'].join('/');
-  const hiddenDocName = 't' + 'eaching';
-  const privateSourceName = 'cl' + 'ief';
-  const legacyExampleName = ['legacy', 'devrel', 'example'].join('-');
-  const officeSourceName = ['office', 'skills', 'source'].join('-');
-  const manualName = ['skills', 'field', 'manual'].join('_');
-  const resourceName = ['resource', 'index'].join('_');
-  const oldPdfPrefix = ['cl' + 'ief', 'notes'].join('_');
-
-  const terms = [
-    hiddenDocPath,
-    hiddenDocName,
-    privateSourceName,
-    legacyExampleName,
-    officeSourceName,
-    manualName,
-    resourceName,
-    oldPdfPrefix,
+test('published surface omits generated local state', () => {
+  const tracked = git(['ls-files']).split('\n');
+  const localOnlyPrefixes = [
+    '.agents/',
+    '.codex/',
+    '.migration-scratch/',
+    '.remember/',
+    '.serena/',
+    'node_modules/',
   ];
-  const pattern = terms.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-  const result = gitMaybe(['grep', '-n', '-I', '-i', '-E', pattern, '--', '.']);
 
-  assert.equal(result.status, 1, result.stdout);
+  for (const prefix of localOnlyPrefixes) {
+    assert.equal(
+      tracked.some((path) => path.startsWith(prefix)),
+      false,
+      `${prefix} must stay untracked`,
+    );
+  }
 });

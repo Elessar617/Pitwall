@@ -23,7 +23,7 @@ Then the agent infrastructure:
 - **`.claude/rules/`** — 7 always-loaded constraints (TDD mandatory, conventional commits, portability, etc.)
 - **`.claude/skills/`** — 14 procedures (6 project-specific, 4 office-doc generation, 4 routing-vendored)
 - **`.claude/agents/`** — 4 subagent specs (planner, implementer, reviewer, adversary)
-- **`.claude/hooks/`** — 4 bash hooks that enforce rules by construction
+- **`.claude/hooks/`** — 5 bash hooks that enforce rules and inject routing context
 - **`.claude/settings.json`** — wires hooks, MCP servers, plugins, permissions
 - **`.claude/reference/`** — F1 + Pitwall facts agents look up on demand
 

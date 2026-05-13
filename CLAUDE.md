@@ -30,7 +30,7 @@ pitwall/
 │  ├─ skills/            ← on-demand procedures (14 skills: 6 project + 4 office + 4 routing-vendored)
 │  ├─ agents/            ← planner, implementer, reviewer, adversary specs
 │  ├─ reference/         ← looked up on demand (F1 + Pitwall facts live here)
-│  ├─ hooks/             ← four bash hooks enforcing rules by construction
+│  ├─ hooks/             ← five bash hooks enforcing rules + routing context
 │  ├─ settings.json      ← wires hooks, plugins, MCP servers
 │  ├─ .portability-deny.txt   ← deny list for the portability hook (F1 terms)
 │  └─ MCP-SETUP.md       ← post-clone setup: plugins + GitHub PAT
