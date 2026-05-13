@@ -1,6 +1,6 @@
 # External Resources
 
-Curated resources for working with Claude (Code, API, plugins).
+Curated resources for working with Claude (Code, API, plugins). Sourced from the Clief Resource Index (`docs/teaching/clief-notes/resource_index.pdf`).
 
 ## Official Anthropic
 
@@ -39,3 +39,19 @@ Curated resources for working with Claude (Code, API, plugins).
 - **Want a Claude Code workflow?** → obra/superpowers
 - **Want to learn fundamentals?** → Anthropic Courses
 - **Confused about which Claude feature to use?** → Skills Explained blog post
+
+---
+
+## Pitwall-specific: Formula 1 data sources
+
+The APIs and Python libraries Pitwall depends on. See `.claude/reference/project-architecture.md` for how each is wired into the app.
+
+| Resource | URL | What it's for |
+|---|---|---|
+| **FastF1** | https://docs.fastf1.dev / github.com/theOehrly/Fast-F1 | Python library wrapping the official F1 timing API plus Ergast. Used for tyre compound history and telemetry to fit tyre-degradation curves. Heavier install (`pandas`, `numpy`); used in batch and cached. |
+| **OpenF1** | https://openf1.org/ / https://api.openf1.org | REST + WebSocket relay of the F1 live timing feed. Free, no auth. Source of driver positions (the track map), gaps, sector times, lap data during sessions. |
+| **Jolpica-F1** | https://github.com/jolpica/jolpica-f1 / https://api.jolpi.ca/ergast/ | Direct successor to the now-frozen Ergast API. Free REST. Powers schedule, standings, drivers, constructors, results history. |
+| **Ergast (archived)** | https://ergast.com/mrd/ | Historical F1 results API; frozen end-of-2024. Use Jolpica-F1 for live data; Ergast docs remain useful as the API contract reference. |
+| **Formula 1 official** | https://www.formula1.com | Authoritative schedule, regulations, news. Used as a human cross-reference, not a programmatic source. |
+| **FIA** | https://www.fia.com | Governing body; sporting and technical regulations. |
+| **Pirelli motorsport** | https://www.pirelli.com/tires/en-ww/motorsport/f1 | Tyre compound allocations per Grand Prix (C1-C5 mapping to Soft/Medium/Hard). |
