@@ -1,6 +1,6 @@
 # MCP Server Catalog
 
-The four MCP servers configured in `.claude/settings.json` (`filesystem`, `git`, `fetch`, `github`) are the baseline. This file catalogs additional MCP servers available from the community and how to find more.
+The four MCP servers configured in `.claude/settings.json` (`filesystem`, `git`, `fetch`, `github`) are the baseline. This file catalogs additional MCP servers available from the community and how to find more. Sourced from the Clief Resource Index (`docs/teaching/clief-notes/resource_index.pdf`, §4).
 
 ## How to add a server
 
