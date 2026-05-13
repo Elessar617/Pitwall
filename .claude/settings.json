@@ -60,6 +60,27 @@
     ]
   },
   "_pluginsNote": "Claude Code plugins are installed via the /plugin install command and live globally in ~/.claude/plugins/. To enable the recommended plugins for this repo, run after cloning: `/plugin marketplace add anthropics/claude-plugins-official` then `/plugin install obra/superpowers` and `/plugin install affaan-m/everything-claude-code`. See .claude/MCP-SETUP.md for full instructions.",
-  "_mcpServersNote": "MCP servers are no longer configured in settings.json (the field is not in the modern schema and was silently ignored). Register them via `claude mcp add` instead. See .claude/MCP-SETUP.md for the post-clone commands that install the project's baseline MCP servers.",
+  "_mcpServersNote": "The mcpServers block below has TWO consumers: (1) Claude Code's runtime schema silently ignores it (per Pitwall's investigation) — for actual MCP registration in Claude Code, use `claude mcp add` (writes to ~/.claude.json) per .claude/MCP-SETUP.md. (2) scripts/rebuild-registry.mjs reads this field as the canonical source for MCP names referenced in .claude/routing/*.md. So the block is kept for the routing/registry validator even though Claude Code itself ignores it.",
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "$CLAUDE_PROJECT_DIR"]
+    },
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git", "--repository", "$CLAUDE_PROJECT_DIR"]
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  },
   "_disablingHooks": "To disable a specific hook for a session, comment out its entry above (JSON does not support comments natively; remove the entry temporarily and restore from git) or set CLAUDE_DISABLE_HOOKS=<hook-name> as an env var if your Claude Code version supports it."
 }
