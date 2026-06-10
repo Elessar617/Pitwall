@@ -542,6 +542,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#team-colours" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Team colours
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#battle-views" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Battle views
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#replay-engine" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -771,6 +793,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#team-colours" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Team colours
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#battle-views" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Battle views
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#replay-engine" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -825,7 +869,48 @@ show <code>+1 LAP</code>; retired cars keep their last known state.</p>
 <h2 id="the-track-map">The track map</h2>
 <p>The circuit outline is <strong>drawn from the cars' own telemetry</strong> — x/y location
 samples projected onto a braille grid, so one full lap traces the track at
-2×4 dots per terminal cell. A marker shows the live car position each tick.</p>
+2×4 dots per terminal cell. <strong>Every covered car</strong> appears as a marker in its
+team colour, updated each tick.</p>
+<h2 id="team-colours">Team colours</h2>
+<p>Driver codes in the tower and markers on the map are tinted with each team's
+real colour, straight from the OpenF1 drivers feed — McLaren papaya, Ferrari
+red, Mercedes teal. Drivers without a published colour fall back to the
+default text style instead of breaking the row.</p>
+<h2 id="battle-views">Battle views</h2>
+<p>Press <span class="pitwall-key">v</span> to cycle focused views — the tower
+<em>and</em> the map filter together, so you watch one fight at a time:</p>
+<table>
+<thead>
+<tr>
+<th>View</th>
+<th>Who's in it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>all</td>
+<td>every classified car (and the unclassified, listed last)</td>
+</tr>
+<tr>
+<td>lead fight</td>
+<td>P1–P5</td>
+</tr>
+<tr>
+<td>podium fight</td>
+<td>P1–P4</td>
+</tr>
+<tr>
+<td>points fight</td>
+<td>P8–P12, straddling the points cutoff</td>
+</tr>
+</tbody>
+</table>
+<figure class="pitwall-shot">
+<p><img alt="The lead-fight view: the top five drivers in the timing tower beside the track map showing only their five team-coloured markers" src="../../assets/views-lead.svg" /></p>
+</figure>
+<figure class="pitwall-shot">
+<p><img alt="The points-fight view: positions eight through twelve in the tower, the map filtered to those five cars" src="../../assets/views-points.svg" /></p>
+</figure>
 <h2 id="replay-engine">Replay engine</h2>
 <p>Replays are first-class: a deterministic engine merges every recorded stream
 into one ordered timeline and plays it back at a configurable speed multiplier.

@@ -777,7 +777,7 @@ play against the actual race.</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$ </span>uvx<span class="w"> </span>--from<span class="w"> </span>git+https://github.com/Elessar617/Pitwall<span class="w"> </span>pitwall
 </code></pre></div>
 <figure class="pitwall-shot">
-<p><img alt="The live timing screen: a 22-driver timing tower with intervals, gaps, last laps and tyre compounds beside a braille rendering of the Circuit Gilles Villeneuve outline with a car marker" src="assets/live.svg" /></p>
+<p><img alt="The live timing screen: a 22-driver timing tower with team-coloured driver codes beside a braille Circuit Gilles Villeneuve outline showing every car as a team-coloured marker" src="assets/live.svg" /></p>
 <figcaption>Replay of the 2026 Canadian Grand Prix — the timing tower beside the track map, drawn live from real car telemetry.</figcaption>
 </figure>
 <h2 id="what-it-does">What it does</h2>
@@ -787,8 +787,9 @@ play against the actual race.</p>
   cache-first from the <a href="https://github.com/jolpica/jolpica-f1">Jolpica F1 API</a>.</li>
 <li><strong>Live timing &amp; track map</strong> — a timing tower and a track outline drawn from
   <a href="https://openf1.org/">OpenF1</a> car telemetry, in braille characters at terminal
-  resolution. Works against a live session or a recorded replay that ships in
-  the repo.</li>
+  resolution — every car a marker in its team colour, with battle views that
+  focus the lead fight, the podium, or the points. Works live or against a
+  recorded replay that ships in the repo.</li>
 <li><strong>Strategy mini-game</strong> — commit a tyre + pit plan before lights out, answer
   pit-window prompts as the race unfolds, and get scored against what the
   driver actually did.</li>
