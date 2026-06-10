@@ -1,0 +1,46 @@
+{
+ "MRData": {
+  "xmlns": "",
+  "series": "f1",
+  "url": "https://api.jolpi.ca/ergast/f1/2026/driverstandings/",
+  "limit": "100",
+  "offset": "0",
+  "total": "1",
+  "StandingsTable": {
+   "season": "2026",
+   "round": "6",
+   "StandingsLists": [
+    {
+     "season": "2026",
+     "round": "6",
+     "DriverStandings": [
+      {
+       "position": "1",
+       "positionText": "1",
+       "points": "abc",
+       "wins": "5",
+       "Driver": {
+        "driverId": "antonelli",
+        "permanentNumber": "12",
+        "code": "ANT",
+        "url": "https://en.wikipedia.org/wiki/Andrea_Kimi_Antonelli",
+        "givenName": "Andrea Kimi",
+        "familyName": "Antonelli",
+        "dateOfBirth": "2006-08-25",
+        "nationality": "Italian"
+       },
+       "Constructors": [
+        {
+         "constructorId": "mercedes",
+         "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One",
+         "name": "Mercedes",
+         "nationality": "German"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

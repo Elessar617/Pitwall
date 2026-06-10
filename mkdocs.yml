@@ -1,0 +1,48 @@
+site_name: Pitwall
+site_description: An open-source terminal companion for Formula 1 — live timing, a braille track map, season tracking, and a strategy mini-game.
+site_url: https://elessar617.github.io/Pitwall/
+repo_url: https://github.com/Elessar617/Pitwall
+repo_name: Elessar617/Pitwall
+docs_dir: www
+
+theme:
+  name: material
+  logo: assets/favicon.svg
+  favicon: assets/favicon.svg
+  palette:
+    scheme: slate
+    primary: custom
+    accent: custom
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - toc.follow
+
+extra_css:
+  - stylesheets/pitwall.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Features:
+      - Season tracker: features/season.md
+      - Live timing & track map: features/live.md
+      - Strategy game: features/game.md
+  - Reference:
+      - Keyboard: reference/keys.md
+      - Data sources & credits: reference/credits.md

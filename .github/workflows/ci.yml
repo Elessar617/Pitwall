@@ -1,0 +1,45 @@
+# Product CI — the public repo carries only the Pitwall application.
+#
+# Security note: no github.event.* fields are interpolated into `run:`
+# commands; every step is a fixed command with no operator-controllable
+# arguments.
+#
+# Gates mirrored from the local pipeline: pytest -W error (incl. doctests),
+# ruff lint + format check, ty type check, and a build smoke.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Tests + lint + types
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Sync environment
+        run: uv sync --dev
+
+      - name: Tests (warnings as errors, doctests on)
+        run: uv run pytest -W error
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Format check
+        run: uv run ruff format --check .
+
+      - name: Type check
+        run: uv run ty check
+
+      - name: Build distribution
+        run: uv build
