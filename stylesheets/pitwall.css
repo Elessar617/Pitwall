@@ -1,0 +1,52 @@
+/* Pitwall palette: terminal-dark with the telemetry-green accent. */
+:root {
+  --md-primary-fg-color: #0c1116;
+  --md-primary-fg-color--light: #11181f;
+  --md-primary-fg-color--dark: #0c1116;
+  --md-accent-fg-color: #3fdfa0;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #0c1116;
+  --md-default-fg-color: #e8eef2;
+  --md-typeset-a-color: #3fdfa0;
+  --md-code-bg-color: #11181f;
+}
+
+/* Screenshot frames: terminal-window chrome. */
+.pitwall-shot {
+  border: 1px solid #1f2a33;
+  border-radius: 0.6rem;
+  background: #0c1116;
+  padding: 0.4rem;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 45%);
+}
+
+.pitwall-shot img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Keycap styling for the keyboard reference. */
+.pitwall-key {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0.1em 0.45em;
+  border: 1px solid #2a3742;
+  border-bottom-width: 3px;
+  border-radius: 0.35em;
+  background: #11181f;
+  font-family: var(--md-code-font-family);
+  text-align: center;
+  color: #3fdfa0;
+}
+
+.pitwall-hero {
+  text-align: center;
+  margin: 1.5rem 0 2rem;
+}
+
+.pitwall-hero img {
+  max-width: 14rem;
+}
