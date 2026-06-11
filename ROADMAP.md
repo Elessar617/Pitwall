@@ -14,6 +14,7 @@ Pitwall shipped all three planned pillars — season tracker (v0.1.0), live timi
 - **Per-stint tyre degradation and undercut/overcut hints** in the strategy game — the original v2 idea, dependent on a degradation data source.
 - **Sector colors and mini-sector timing** in the live tower, if OpenF1 exposes them reliably.
 - **Configurable theming** beyond the built-in team colors.
+- **World Endurance Championship (WEC) expansion** once the F1 core stays stable: identify reliable WEC data sources, model multi-class endurance sessions cleanly, and keep F1 as the reference implementation instead of generalizing prematurely.
 - **PyPI release** so `uvx pitwall` works without the `--from git+…` form.
 
 ## Won't fix (with reasons)
