@@ -53,6 +53,8 @@ uv run pitwall --replay tests/fixtures/openf1/1285_11291_excerpt  # offline repl
 uv run pitwall --live                                           # follow a live session
 ```
 
+Pitwall requires Python 3.13+, and `uv` provisions that interpreter for you.
+
 The replay demo is the fastest tour: press `l` for the timing tower + track
 map (press `v` to cycle battle views), `g` to play the strategy game. Keys:
 `s` schedule · `n` standings · `r` results · `p` profiles · `l` live ·
@@ -62,9 +64,10 @@ map (press `v` to cycle battle views), `g` to play the strategy game. Keys:
 
 ```bash
 uv sync                          # install dev deps
-uv run pytest -W error           # 351 tests, warnings as errors, doctests on
+uv run pytest -W error           # full Python suite, warnings as errors, doctests on
 uv run ruff check . && uv run ruff format --check .
 uv run ty check
+uv build
 ```
 
 Every feature shipped through a TDD pipeline with an adversarial review gate;

@@ -1,12 +1,32 @@
 import argparse
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pitwall.app import PitwallApp
-import os
 
 from pitwall import __version__
-from pitwall.config import MAX_REPLAY_SPEED, MIN_REFRESH_INTERVAL_S, MIN_REPLAY_SPEED, AppConfig, default_season
+from pitwall.config import (
+    DEFAULT_REFRESH_INTERVAL_S,
+    DEFAULT_REPLAY_SPEED,
+    MAX_REPLAY_SPEED,
+    MIN_REFRESH_INTERVAL_S,
+    MIN_REPLAY_SPEED,
+    AppConfig,
+    default_season,
+)
+
+REPLAY_DEMO_PATH = "tests/fixtures/openf1/1285_11291_excerpt"
+
+HELP_EPILOG = f"""examples:
+  pitwall
+  pitwall --replay {REPLAY_DEMO_PATH}
+  pitwall --replay {REPLAY_DEMO_PATH} --replay-speed 10
+  pitwall --live
+
+keys:
+  s schedule, n standings, r results, p profiles, l live, g game, v views, q quit
+"""
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -15,7 +35,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     Raises:
         SystemExit: If version is requested or invalid arguments are passed.
     """
-    parser = argparse.ArgumentParser(prog="pitwall")
+    parser = argparse.ArgumentParser(
+        prog="pitwall",
+        description="Formula 1 terminal companion for season data, replay timing, live sessions, and strategy.",
+        epilog=HELP_EPILOG,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     parser.add_argument(
         "--version",
         action="version",
@@ -23,21 +48,24 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "--refresh-interval",
+        metavar="SECONDS",
         type=int,
-        default=30,
-        help="Refresh interval in seconds (minimum 5).",
+        default=DEFAULT_REFRESH_INTERVAL_S,
+        help=f"Refresh interval in seconds (minimum {MIN_REFRESH_INTERVAL_S}, default {DEFAULT_REFRESH_INTERVAL_S}).",
     )
     parser.add_argument(
         "--replay",
+        metavar="DIR",
         type=str,
         default=None,
         help="Directory containing OpenF1 session replay fixtures.",
     )
     parser.add_argument(
         "--replay-speed",
+        metavar="X",
         type=float,
         default=None,
-        help="Replay speed multiplier (1.0 to 600.0, default 60.0).",
+        help=f"Replay speed multiplier ({MIN_REPLAY_SPEED:g}x to {MAX_REPLAY_SPEED:g}x, default {DEFAULT_REPLAY_SPEED:g}x).",
     )
     parser.add_argument(
         "--live",
@@ -54,14 +82,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     if args.live and args.replay is not None:
         parser.error("cannot specify --live with --replay")
 
-    if args.replay is not None and not os.path.isdir(args.replay):
+    if args.replay is not None and not Path(args.replay).is_dir():
         parser.error(f"replay directory does not exist: {args.replay}")
 
     if args.replay_speed is not None and args.replay is None:
         parser.error("cannot specify --replay-speed without --replay")
 
     if args.replay_speed is None:
-        args.replay_speed = 60.0
+        args.replay_speed = DEFAULT_REPLAY_SPEED
 
     if args.replay_speed < MIN_REPLAY_SPEED or args.replay_speed > MAX_REPLAY_SPEED:
         parser.error(f"replay-speed must be between {MIN_REPLAY_SPEED} and {MAX_REPLAY_SPEED}")

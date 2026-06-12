@@ -2,6 +2,7 @@ import asyncio
 import json
 from collections.abc import Awaitable, Callable
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 
@@ -41,7 +42,7 @@ def build_query(params: dict[str, Any], filters: list[tuple[str, str, Any]] | No
     """Build URL query string with custom percent-encoding for operators in param names."""
     parts = []
     for k, v in params.items():
-        parts.append(f"{k}={v}")
+        parts.append(f"{k}={quote(str(v), safe=':')}")
     if filters:
         for field, op, val in filters:
             if op == ">":
@@ -50,7 +51,7 @@ def build_query(params: dict[str, Any], filters: list[tuple[str, str, Any]] | No
                 encoded_op = "%3C"
             else:
                 raise ValueError(f"Unsupported operator: {op}")  # noqa: TRY003
-            parts.append(f"{field}{encoded_op}{val}")
+            parts.append(f"{field}{encoded_op}{quote(str(val), safe=':')}")
     return "&".join(parts)
 
 

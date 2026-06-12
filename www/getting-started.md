@@ -22,6 +22,8 @@ is not on PyPI yet — run it straight from GitHub.
 Requires Python 3.13+ (uv provisions it for you) and a terminal with Unicode
 support — the track map is drawn in braille characters.
 
+Inside a clone, prefix the commands below with `uv run`.
+
 ## Three ways to watch
 
 **Season mode (default).** Live season data — schedule, standings, results,
@@ -41,7 +43,7 @@ a race weekend:
 $ pitwall --replay tests/fixtures/openf1/1285_11291_excerpt
 ```
 
-Add `--replay-speed 10` to slow the playback down (default is ×60).
+Add `--replay-speed 10` to slow the demo relative to the default ×60 playback.
 
 **Live mode.** Follow an in-progress session from the OpenF1 live API:
 

@@ -2,6 +2,7 @@ import pytest
 
 import pitwall
 from pitwall.cli import build_app, main, parse_args
+from pitwall.config import DEFAULT_REFRESH_INTERVAL_S, DEFAULT_REPLAY_SPEED
 
 
 def test_version_prints_and_exits_zero(capsys):
@@ -38,7 +39,7 @@ def test_refresh_interval_default_and_min():
     assert args_min.refresh_interval == 5
 
     args_default = parse_args([])
-    assert args_default.refresh_interval == 30
+    assert args_default.refresh_interval == DEFAULT_REFRESH_INTERVAL_S
 
 
 def test_build_app_plumbs_config(monkeypatch):
@@ -79,21 +80,43 @@ def test_min_refresh_interval_single_source():
     source = inspect.getsource(cli_module)
     assert "MIN_REFRESH_INTERVAL_S: int =" not in source
     assert cli_module.MIN_REFRESH_INTERVAL_S is config_module.MIN_REFRESH_INTERVAL_S
-    assert "MIN_REFRESH_INTERVAL_S" in source.split("from pitwall.config import", 1)[-1].splitlines()[0]
+    assert "MIN_REFRESH_INTERVAL_S" in source.split("from pitwall.config import", 1)[-1].split(")", 1)[0]
+
+
+def test_cli_defaults_are_single_source():
+    import pitwall.cli as cli_module
+    import pitwall.config as config_module
+
+    assert cli_module.DEFAULT_REFRESH_INTERVAL_S is config_module.DEFAULT_REFRESH_INTERVAL_S
+    assert cli_module.DEFAULT_REPLAY_SPEED is config_module.DEFAULT_REPLAY_SPEED
+
+
+def test_cli_help_highlights_modes_examples_and_defaults(capsys):
+    with pytest.raises(SystemExit) as exc_info:
+        parse_args(["--help"])
+
+    captured = capsys.readouterr()
+    assert exc_info.value.code == 0
+    assert "Formula 1 terminal companion" in captured.out
+    assert "examples:" in captured.out
+    assert "pitwall --replay tests/fixtures/openf1/1285_11291_excerpt" in captured.out
+    assert "pitwall --live" in captured.out
+    assert f"default {DEFAULT_REFRESH_INTERVAL_S}" in captured.out
+    assert f"default {DEFAULT_REPLAY_SPEED:g}x" in captured.out
 
 
 def test_replay_flags_happy_path(tmp_path):
     # default values
     args = parse_args([])
     assert args.replay is None
-    assert args.replay_speed == 60.0
+    assert args.replay_speed == DEFAULT_REPLAY_SPEED
 
     # valid --replay
     tmpdir = tmp_path / "replay_fixtures"
     tmpdir.mkdir()
     args = parse_args(["--replay", str(tmpdir)])
     assert args.replay == str(tmpdir)
-    assert args.replay_speed == 60.0
+    assert args.replay_speed == DEFAULT_REPLAY_SPEED
 
     # valid --replay and --replay-speed
     args = parse_args(["--replay", str(tmpdir), "--replay-speed", "120.0"])
@@ -169,7 +192,7 @@ def test_live_flag_happy_path():
     args = parse_args(["--live"])
     assert args.live is True
     assert args.replay is None
-    assert args.replay_speed == 60.0
+    assert args.replay_speed == DEFAULT_REPLAY_SPEED
 
 
 def test_live_flag_mutual_exclusion(capsys, tmp_path):

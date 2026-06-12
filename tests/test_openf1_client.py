@@ -26,6 +26,15 @@ def test_build_query_literal():
         build_query({"session_key": 11291}, [("date", ">=", "2026-05-24T20:00:00")])
 
 
+def test_build_query_percent_encodes_values_without_touching_filter_operators():
+    query = build_query(
+        {"session_key": "latest race"},
+        [("date", ">", "2026-05-24T20:00:00+00:00")],
+    )
+
+    assert query == "session_key=latest%20race&date%3E2026-05-24T20:00:00%2B00:00"
+
+
 @pytest.mark.asyncio
 async def test_404_yields_empty_list() -> None:
     # AC-2b: On MockTransport: a 404 response yields [] from every get_* method, raising nothing
