@@ -16,7 +16,7 @@ Audit Pitwall now that GitHub is the live source of truth, with emphasis on:
 - Package version: `pitwall 0.3.0`
 - Python: `3.13.13` via `uv`
 - Graphify: `graphifyy` / `graphify 0.8.38`
-- Graphify output: `graphify-out/`, 708 nodes and 2027 edges from `src/pitwall`
+- Graphify output: generated locally in `graphify-out/` with 708 nodes and 2027 edges from `src/pitwall`; ignored so analysis artifacts do not publish to GitHub.
 
 ## Findings Fixed
 
@@ -34,7 +34,7 @@ Audit Pitwall now that GitHub is the live source of truth, with emphasis on:
 - Jolpica live smoke fetched 22 races for the 2026 season.
 - Runtime data layers already use bounded retry loops, typed parse boundaries, cache-first reads, and offline fixture seams.
 - Python runtime dependencies remain lean: `textual` and `httpx`; storage uses stdlib `sqlite3`.
-- Graphify callflow export still warns about edge endpoints missing from its generated graph; this appears to be a Graphify export limitation, not a Pitwall runtime finding.
+- The local Graphify callflow export still warns about edge endpoints missing from its generated graph; this appears to be a Graphify export limitation, not a Pitwall runtime finding.
 
 ## Verification During Fixes
 

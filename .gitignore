@@ -128,5 +128,8 @@ tests/unit/
 # MkDocs build output
 /site/
 
+# Generated Graphify output; keep local analysis artifacts out of GitHub.
+graphify-out/
+
 # agy write-probe scratch
 probe*.txt
