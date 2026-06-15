@@ -73,6 +73,9 @@ uv build
 Every feature shipped through a TDD pipeline with an adversarial review gate;
 tests are offline-deterministic against real recorded API payloads.
 
+For the story behind the build — the decisions, the deep dives, and the dead
+ends — see the [dev log](https://elessar617.github.io/Pitwall/dev-log/).
+
 ## Data sources
 
 - [**Jolpica-F1**](https://github.com/jolpica/jolpica-f1) — schedule, standings,

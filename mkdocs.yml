@@ -46,3 +46,4 @@ nav:
   - Reference:
       - Keyboard: reference/keys.md
       - Data sources & credits: reference/credits.md
+  - Dev log: dev-log.md
