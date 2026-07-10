@@ -133,3 +133,8 @@ graphify-out/
 
 # agy write-probe scratch
 probe*.txt
+
+# universal-standards:start
+!/CLAUDE.md
+!/AGENTS.md
+# universal-standards:end

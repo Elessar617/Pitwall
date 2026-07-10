@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Universal Standards Waiver Registry",
+  "type": "array",
+  "uniqueItems": true,
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^W-[0-9]{8}-[0-9]{3}$"
+      },
+      "rule_id": {
+        "type": "string",
+        "enum": [
+          "U1",
+          "U2",
+          "U3",
+          "U4",
+          "U5",
+          "U6",
+          "U7",
+          "U8",
+          "U9",
+          "U10",
+          "U12",
+          "U13",
+          "U16",
+          "Q1",
+          "Q2",
+          "Q3",
+          "Q4",
+          "Q5",
+          "Q6",
+          "Q7",
+          "Q8",
+          "Q9",
+          "Q10",
+          "A2",
+          "A4",
+          "A5",
+          "A6",
+          "A7",
+          "A10",
+          "M-ALL-01",
+          "M-PYTHON-01",
+          "M-PYTHON-02",
+          "M-PYTHON-03",
+          "M-PYTHON-04",
+          "M-PYTHON-05",
+          "M-PYTHON-06",
+          "M-PYTHON-07",
+          "M-TYPESCRIPT-01",
+          "M-TYPESCRIPT-02",
+          "M-TYPESCRIPT-03",
+          "M-TYPESCRIPT-04",
+          "M-TYPESCRIPT-05",
+          "M-TYPESCRIPT-06",
+          "M-RUST-01",
+          "M-RUST-02",
+          "M-RUST-03",
+          "M-RUST-04",
+          "M-RUST-05",
+          "M-RUST-06",
+          "M-BASH-01",
+          "M-BASH-02",
+          "M-BASH-03",
+          "M-BASH-04",
+          "M-BASH-05",
+          "M-WEB-01",
+          "M-NEW-01"
+        ]
+      },
+      "scope": {
+        "type": "string",
+        "oneOf": [
+          {
+            "pattern": "^path:(?!/)(?!\\s)(?!.*\\s$)(?!\\.{1,2}(?:/|$))(?!.*//)(?!.*(?:/)\\.{1,2}(?:/|$))(?!.*\\/$)[^\\u0000-\\u001f\\u007f\\\\:]+$"
+          },
+          {
+            "pattern": "^process:(?!.*//)(?!.*(?:/)\\.{1,2}(?:/|$))(?!.*\\/$)[A-Za-z0-9][A-Za-z0-9._/-]*$"
+          }
+        ]
+      },
+      "reason": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": ".*\\S.*"
+      },
+      "evidence": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": ".*\\S.*"
+      },
+      "requested_by": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": ".*\\S.*"
+      },
+      "approved_by": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": ".*\\S.*"
+      },
+      "approved_at": {
+        "type": "string",
+        "format": "date",
+        "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])$"
+      },
+      "expires_at": {
+        "type": "string",
+        "format": "date",
+        "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])$"
+      }
+    },
+    "required": [
+      "id",
+      "rule_id",
+      "scope",
+      "reason",
+      "evidence",
+      "requested_by",
+      "approved_by",
+      "approved_at",
+      "expires_at"
+    ],
+    "additionalProperties": false
+  }
+}
