@@ -64,23 +64,48 @@ def tyre_for(driver_number: int, current_lap: int | None, stints: list[Stint]) -
         return "—"
 
     driver_stints = [s for s in stints if s.driver_number == driver_number]
-
-    if not driver_stints:
+    matching = [s for s in driver_stints if s.lap_start <= current_lap <= s.lap_end]
+    # Fall back to the most recent stint already started when none spans current_lap.
+    candidates = matching or [s for s in driver_stints if s.lap_start <= current_lap]
+    if not candidates:
         return "—"
 
-    matching_stints = [s for s in driver_stints if s.lap_start <= current_lap <= s.lap_end]
-    if matching_stints:
-        best_stint = max(matching_stints, key=lambda s: s.lap_start)
-    else:
-        older_stints = [s for s in driver_stints if s.lap_start <= current_lap]
-        if older_stints:
-            best_stint = max(older_stints, key=lambda s: s.lap_start)
-        else:
-            return "—"
-
+    best_stint = max(candidates, key=lambda s: s.lap_start)
     if not best_stint.compound:
         return "—"
     return best_stint.compound[0].upper()
+
+
+def _driver_stats(
+    state: tuple[
+        dict[int, Any],
+        dict[int, tuple[Any, Any]],
+        dict[int, Any],
+        dict[int, Any],
+    ],
+    driver: SessionDriver,
+    stints: list[Stint],
+) -> tuple[Any, str, str, str, str, str]:
+    """Per-driver formatted stats: (pos_val, pos_str, int_str, gap_str, last_str, tyre)."""
+    positions, intervals, last_laps, current_laps = state
+    drv_num = driver.driver_number
+    pos_val = positions.get(drv_num)
+    int_val, gap_val = intervals.get(drv_num, (None, None))
+    pos_str = str(pos_val) if pos_val is not None else "—"
+    return (
+        pos_val,
+        pos_str,
+        format_interval(int_val),
+        format_interval(gap_val),
+        format_lap_time(last_laps.get(drv_num)),
+        tyre_for(drv_num, current_laps.get(drv_num), stints),
+    )
+
+
+def _sorted_cells[CellsT](rows: list[tuple[Any, int, CellsT]]) -> list[CellsT]:
+    """Sort (pos_val, driver_number, cells) rows: None positions last, then driver number."""
+    rows.sort(key=lambda x: (x[0] is None, x[0], x[1]))
+    return [x[2] for x in rows]
 
 
 def build_tower_rows(
@@ -94,28 +119,13 @@ def build_tower_rows(
     stints: list[Stint],
 ) -> list[tuple[str, ...]]:
     """Build and format rows sorted by (position is None, position, driver_number)."""
-    positions, intervals, last_laps, current_laps = state
     rows = []
 
     for driver in drivers:
-        drv_num = driver.driver_number
-        pos_val = positions.get(drv_num)
-        int_val, gap_val = intervals.get(drv_num, (None, None))
-        last_val = last_laps.get(drv_num)
-        current_lap = current_laps.get(drv_num)
+        pos_val, pos_str, int_str, gap_str, last_str, tyre = _driver_stats(state, driver, stints)
+        rows.append((pos_val, driver.driver_number, (pos_str, driver.name_acronym, int_str, gap_str, last_str, tyre)))
 
-        tyre = tyre_for(drv_num, current_lap, stints)
-
-        pos_str = str(pos_val) if pos_val is not None else "—"
-        drv_str = driver.name_acronym
-        int_str = format_interval(int_val)
-        gap_str = format_interval(gap_val)
-        last_str = format_lap_time(last_val)
-
-        rows.append((pos_val, drv_num, (pos_str, drv_str, int_str, gap_str, last_str, tyre)))
-
-    rows.sort(key=lambda x: (x[0] is None, x[0], x[1]))
-    return [x[2] for x in rows]
+    return _sorted_cells(rows)
 
 
 def build_view_rows(
@@ -131,41 +141,33 @@ def build_view_rows(
     styles: Mapping[int, str],
 ) -> list[tuple]:
     """Build view rows filtered by position bounds, Drv cell styled as rich.text.Text."""
-    positions, intervals, last_laps, current_laps = state
+    positions = state[0]
     rows = []
 
     for driver in drivers:
         drv_num = driver.driver_number
         if drv_num not in positions and view.key != "all":
             continue
-        pos_val = positions.get(drv_num)
-        int_val, gap_val = intervals.get(drv_num, (None, None))
-        last_val = last_laps.get(drv_num)
-        current_lap = current_laps.get(drv_num)
+        pos_val, pos_str, int_str, gap_str, last_str, tyre = _driver_stats(state, driver, stints)
 
         admitted = True if view.key == "all" else pos_val is not None and view.lo <= pos_val <= view.hi
 
         if not admitted:
             continue
 
-        tyre = tyre_for(drv_num, current_lap, stints)
-
-        pos_str = str(pos_val) if pos_val is not None else "—"
-        style = styles.get(drv_num, "")
-        drv_text = rich.text.Text(driver.name_acronym, style=style)
+        drv_text = rich.text.Text(driver.name_acronym, style=styles.get(drv_num, ""))
         # SEC-1: every string cell wraps in Text so no API field parses as markup.
         cells = (
             rich.text.Text(pos_str),
             drv_text,
-            rich.text.Text(format_interval(int_val)),
-            rich.text.Text(format_interval(gap_val)),
-            rich.text.Text(format_lap_time(last_val)),
+            rich.text.Text(int_str),
+            rich.text.Text(gap_str),
+            rich.text.Text(last_str),
             rich.text.Text(tyre),
         )
         rows.append((pos_val, drv_num, cells))
 
-    rows.sort(key=lambda x: (x[0] is None, x[0], x[1]))
-    return [x[2] for x in rows]
+    return _sorted_cells(rows)
 
 
 def filter_markers(

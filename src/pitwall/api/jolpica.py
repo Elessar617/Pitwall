@@ -128,68 +128,52 @@ class JolpicaClient:
         if total > len(records):
             raise DataParseError.pagination_overflow(total, len(records))
 
+    async def _fetch[T](self, path: str, parser: Callable[[dict[str, Any]], list[T]]) -> list[T]:
+        """GET base_url + path, parse the payload, and enforce the pagination guard."""
+        url = f"{self.base_url}{path}"
+        payload = await self._request(url)
+        records = parser(payload)
+        self._check_pagination(payload, records)
+        return records
+
     async def get_races(self, season: int | str) -> list[Race]:
         """Fetch the schedule of races for the specified season.
 
         Invariant: Retrievable via the schedule endpoint and returned as a list of typed Race models.
         """
-        url = f"{self.base_url}/{season}/races/"
-        payload = await self._request(url)
-        records = parse_races(payload)
-        self._check_pagination(payload, records)
-        return records
+        return await self._fetch(f"/{season}/races/", parse_races)
 
     async def get_driver_standings(self, season: int | str) -> list[DriverStanding]:
         """Fetch the driver standings for the specified season.
 
         Invariant: Retrievable via the driverstandings endpoint and returned as a list of typed DriverStanding models.
         """
-        url = f"{self.base_url}/{season}/driverstandings/"
-        payload = await self._request(url)
-        records = parse_driver_standings(payload)
-        self._check_pagination(payload, records)
-        return records
+        return await self._fetch(f"/{season}/driverstandings/", parse_driver_standings)
 
     async def get_constructor_standings(self, season: int | str) -> list[ConstructorStanding]:
         """Fetch the constructor standings for the specified season.
 
         Invariant: Retrievable via the constructorstandings endpoint and returned as a list of typed ConstructorStanding models.
         """
-        url = f"{self.base_url}/{season}/constructorstandings/"
-        payload = await self._request(url)
-        records = parse_constructor_standings(payload)
-        self._check_pagination(payload, records)
-        return records
+        return await self._fetch(f"/{season}/constructorstandings/", parse_constructor_standings)
 
     async def get_results(self, season: int | str, round: int | str) -> list[RaceResult]:  # noqa: A002
         """Fetch race results for a specific season and round.
 
         Invariant: Retrievable via the results endpoint and returned as a list of typed RaceResult models.
         """
-        url = f"{self.base_url}/{season}/{round}/results/"
-        payload = await self._request(url)
-        records = parse_results(payload)
-        self._check_pagination(payload, records)
-        return records
+        return await self._fetch(f"/{season}/{round}/results/", parse_results)
 
     async def get_drivers(self, season: int | str) -> list[Driver]:
         """Fetch the list of drivers registered for the specified season.
 
         Invariant: Retrievable via the drivers endpoint and returned as a list of typed Driver models.
         """
-        url = f"{self.base_url}/{season}/drivers/"
-        payload = await self._request(url)
-        records = parse_drivers(payload)
-        self._check_pagination(payload, records)
-        return records
+        return await self._fetch(f"/{season}/drivers/", parse_drivers)
 
     async def get_constructors(self, season: int | str) -> list[Constructor]:
         """Fetch the list of constructors registered for the specified season.
 
         Invariant: Retrievable via the constructors endpoint and returned as a list of typed Constructor models.
         """
-        url = f"{self.base_url}/{season}/constructors/"
-        payload = await self._request(url)
-        records = parse_constructors(payload)
-        self._check_pagination(payload, records)
-        return records
+        return await self._fetch(f"/{season}/constructors/", parse_constructors)

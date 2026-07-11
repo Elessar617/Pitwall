@@ -1,13 +1,15 @@
 import sqlite3
+from collections.abc import Awaitable, Callable, Iterable
+from typing import Any
 
 from textual import work
 from textual.app import ComposeResult
 from textual.widgets import DataTable, Static
 
-from pitwall.cache.store import Source
+from pitwall.cache.store import SeasonStore, Source, StoreResult
 from pitwall.errors import JolpicaError
 from pitwall.models import Constructor, Driver
-from pitwall.screens.base import PitwallScreen
+from pitwall.screens.base import PitwallScreen, StoreNotInitializedError
 from pitwall.screens.cells import EM_DASH, safe_row
 from pitwall.workers.season import SeasonSnapshot
 
@@ -28,13 +30,6 @@ def build_driver_rows(drivers: list[Driver]) -> list[tuple[str, ...]]:
 def build_constructor_rows(constructors: list[Constructor]) -> list[tuple[str, str]]:
     sorted_constructors = sorted(constructors, key=lambda c: c.name)
     return [(c.name, c.nationality) for c in sorted_constructors]
-
-
-class StoreNotInitializedError(RuntimeError):
-    """Exception raised when the store is not initialized on the app."""
-
-    def __init__(self) -> None:
-        super().__init__("App store is not initialized")
 
 
 class ProfilesScreen(PitwallScreen):
@@ -131,87 +126,59 @@ class ProfilesScreen(PitwallScreen):
 
         self.query_one("#profiles-constructors-table", DataTable).display = False
 
-    async def _fetch_drivers(self, season: int) -> tuple[bool, list[Driver] | None]:
+    async def _fetch_section(
+        self,
+        season: int,
+        getter: Callable[[SeasonStore, int], Awaitable[StoreResult]],
+        noun: str,
+    ) -> tuple[bool, list[Any] | None]:
         # Concurrency: executes within the profile-rosters exclusive worker group.
         # Failure mode: catching JolpicaError and sqlite3.Error prevents one section's
         # fetch failure from aborting the other section's fetch.
         store = self.app.store
         if store is None:
-            # Invariant: _fetch_rosters raises before dispatching these helpers.
+            # Invariant: _fetch_rosters raises before dispatching this helper.
             raise StoreNotInitializedError()
         try:
-            store_res = await store.get_drivers(season)
+            store_res = await getter(store, season)
             if store_res.source == Source.STALE_CACHE:
                 as_of = f"{store_res.fetched_at:%H:%M}"
-                self.app.notify(f"Serving stale cached drivers (as of {as_of} UTC).", severity="warning")
+                self.app.notify(f"Serving stale cached {noun} (as of {as_of} UTC).", severity="warning")
         except (JolpicaError, sqlite3.Error):
             return False, None
         else:
             return True, store_res.data
 
-    async def _fetch_constructors(self, season: int) -> tuple[bool, list[Constructor] | None]:
-        # Concurrency: executes within the profile-rosters exclusive worker group.
-        # Failure mode: catching JolpicaError and sqlite3.Error prevents one section's
-        # fetch failure from aborting the other section's fetch.
-        store = self.app.store
-        if store is None:
-            # Invariant: _fetch_rosters raises before dispatching these helpers.
-            raise StoreNotInitializedError()
-        try:
-            store_res = await store.get_constructors(season)
-            if store_res.source == Source.STALE_CACHE:
-                as_of = f"{store_res.fetched_at:%H:%M}"
-                self.app.notify(f"Serving stale cached constructors (as of {as_of} UTC).", severity="warning")
-        except (JolpicaError, sqlite3.Error):
-            return False, None
-        else:
-            return True, store_res.data
-
-    def _render_drivers_section(self, season: int, drivers_data: tuple[bool, list[Driver] | None]) -> None:
-        success, drivers_list = drivers_data
-        status = self.query_one("#profiles-drivers-status", Static)
-        table = self.query_one("#profiles-drivers-table", DataTable)
-
-        if success:
-            if not drivers_list:
-                status.update(f"No drivers listed for season {season}.")
-                status.display = True
-                table.display = False
-            else:
-                status.display = False
-                table.clear(columns=True)
-                table.add_columns("No", "Driver", "Code", "Nationality", "Born")
-                # Loop bound: len(drivers_list) <= 30 (maximum grid size for F1).
-                for row in build_driver_rows(drivers_list):
-                    table.add_row(*safe_row(row))
-                table.display = True
-        else:
-            status.update("Drivers unavailable — fetch failed.")
-            status.display = True
-            table.display = False
-
-    def _render_constructors_section(
-        self, season: int, constructors_data: tuple[bool, list[Constructor] | None]
+    def _render_section(
+        self,
+        season: int,
+        data: tuple[bool, list[Any] | None],
+        status_id: str,
+        table_id: str,
+        columns: tuple[str, ...],
+        row_builder: Callable[[list[Any]], Iterable[tuple[str, ...]]],
+        noun: str,
     ) -> None:
-        success, constructors_list = constructors_data
-        status = self.query_one("#profiles-constructors-status", Static)
-        table = self.query_one("#profiles-constructors-table", DataTable)
+        success, items = data
+        status = self.query_one(status_id, Static)
+        table = self.query_one(table_id, DataTable)
 
         if success:
-            if not constructors_list:
-                status.update(f"No constructors listed for season {season}.")
+            if not items:
+                status.update(f"No {noun} listed for season {season}.")
                 status.display = True
                 table.display = False
             else:
                 status.display = False
                 table.clear(columns=True)
-                table.add_columns("Team", "Nationality")
-                # Loop bound: len(constructors_list) <= 15 (maximum team count for F1).
-                for row in build_constructor_rows(constructors_list):
+                table.add_columns(*columns)
+                # Loop bound: len(items) is capped by the season entry list
+                # (grid size for drivers, team count for constructors).
+                for row in row_builder(items):
                     table.add_row(*safe_row(row))
                 table.display = True
         else:
-            status.update("Constructors unavailable — fetch failed.")
+            status.update(f"{noun.capitalize()} unavailable — fetch failed.")
             status.display = True
             table.display = False
 
@@ -234,12 +201,28 @@ class ProfilesScreen(PitwallScreen):
         self._show_loading_states()
 
         # Fetch drivers
-        drivers_data = await self._fetch_drivers(season)
-        self._render_drivers_section(season, drivers_data)
+        drivers_data = await self._fetch_section(season, SeasonStore.get_drivers, "drivers")
+        self._render_section(
+            season,
+            drivers_data,
+            "#profiles-drivers-status",
+            "#profiles-drivers-table",
+            ("No", "Driver", "Code", "Nationality", "Born"),
+            build_driver_rows,
+            "drivers",
+        )
 
         # Fetch constructors
-        constructors_data = await self._fetch_constructors(season)
-        self._render_constructors_section(season, constructors_data)
+        constructors_data = await self._fetch_section(season, SeasonStore.get_constructors, "constructors")
+        self._render_section(
+            season,
+            constructors_data,
+            "#profiles-constructors-status",
+            "#profiles-constructors-table",
+            ("Team", "Nationality"),
+            build_constructor_rows,
+            "constructors",
+        )
 
         # Apply focus
         self._apply_focus()

@@ -2,6 +2,7 @@
 
 import asyncio
 from collections import deque
+from pathlib import Path
 
 import rich.text
 from textual import work
@@ -58,8 +59,6 @@ class StrategyScreen(PitwallScreen):
         status = self.query_one("#game-status", Static)
         replay_dir = self.app.config.replay_dir
         try:
-            from pathlib import Path
-
             if replay_dir is None:
                 # Invariant: the setup worker starts only when replay_dir is set.
                 return

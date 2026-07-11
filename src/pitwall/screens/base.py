@@ -10,6 +10,13 @@ if TYPE_CHECKING:
     from pitwall.app import PitwallApp
 
 
+class StoreNotInitializedError(RuntimeError):
+    """Exception raised when the store is not initialized on the app."""
+
+    def __init__(self) -> None:
+        super().__init__("App store is not initialized")
+
+
 class PitwallScreen(Screen):
     """Base screen composing the chassis around a subclass-provided body."""
 

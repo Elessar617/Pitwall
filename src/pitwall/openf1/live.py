@@ -127,6 +127,12 @@ class LiveSource(TickSource):
         if success:
             self.stints = tuple(data)
 
+    def _windowed_date_gt(self, index: int, cursor: datetime | None, overlap_s: float) -> str | None:
+        """Compute the cursor-windowed date> filter, or None on first tick / no cursor."""
+        if index == 0 or cursor is None:
+            return None
+        return (cursor - timedelta(seconds=overlap_s)).strftime("%Y-%m-%dT%H:%M:%S")
+
     async def _update_simple_stream(self, index: int, name: str, kind: str, getter) -> list[ReplayEvent]:
         """Poll one cursor-windowed stream and dedupe into ReplayEvents.
 
@@ -134,11 +140,7 @@ class LiveSource(TickSource):
         this exact lifecycle; only laps and location have bespoke rules.
         """
         cursor = self._cursors[name]
-        date_gt = (
-            None
-            if (index == 0 or cursor is None)
-            else (cursor - timedelta(seconds=LIVE_CURSOR_OVERLAP_S)).strftime("%Y-%m-%dT%H:%M:%S")
-        )
+        date_gt = self._windowed_date_gt(index, cursor, LIVE_CURSOR_OVERLAP_S)
         data, success = await self._poll_stream(lambda: getter(date_gt))
         if not success:
             return []
@@ -160,11 +162,7 @@ class LiveSource(TickSource):
     async def _update_laps(self, index: int) -> list[ReplayEvent]:
         """Poll laps and synthesize lap_started and lap_completed events."""
         cursor = self._cursors["laps"]
-        date_gt = (
-            None
-            if (index == 0 or cursor is None)
-            else (cursor - timedelta(seconds=LAP_REFETCH_OVERLAP_S)).strftime("%Y-%m-%dT%H:%M:%S")
-        )
+        date_gt = self._windowed_date_gt(index, cursor, LAP_REFETCH_OVERLAP_S)
         data, success = await self._poll_stream(lambda: self.client.get_laps(self.session.session_key, date_gt=date_gt))
         if not success:
             return []
@@ -195,10 +193,8 @@ class LiveSource(TickSource):
         cursor = self._cursors["location"]
         if index == 0:
             date_gt = (self.clock() - timedelta(seconds=LIVE_LOCATION_BACKFILL_S)).strftime("%Y-%m-%dT%H:%M:%S")
-        elif cursor is None:
-            date_gt = None
         else:
-            date_gt = (cursor - timedelta(seconds=LIVE_CURSOR_OVERLAP_S)).strftime("%Y-%m-%dT%H:%M:%S")
+            date_gt = self._windowed_date_gt(index, cursor, LIVE_CURSOR_OVERLAP_S)
         data, success = await self._poll_stream(
             lambda: self.client.get_location(self.session.session_key, date_gt=date_gt)
         )

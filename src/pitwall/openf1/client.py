@@ -45,11 +45,8 @@ def build_query(params: dict[str, Any], filters: list[tuple[str, str, Any]] | No
         parts.append(f"{k}={quote(str(v), safe=':')}")
     if filters:
         for field, op, val in filters:
-            if op == ">":
-                encoded_op = "%3E"
-            elif op == "<":
-                encoded_op = "%3C"
-            else:
+            encoded_op = {">": "%3E", "<": "%3C"}.get(op)
+            if encoded_op is None:
                 raise ValueError(f"Unsupported operator: {op}")  # noqa: TRY003
             parts.append(f"{field}{encoded_op}{quote(str(val), safe=':')}")
     return "&".join(parts)
@@ -98,10 +95,9 @@ class OpenF1Client:
         if query:
             url = f"{url}?{query}"
 
-        max_retries = MAX_RETRIES
         backoff = 1.0
 
-        for attempt in range(max_retries + 1):
+        for attempt in range(MAX_RETRIES + 1):
             try:
                 response = await self.client.get(url)
             except httpx.RequestError as e:
@@ -110,7 +106,7 @@ class OpenF1Client:
             if response.status_code == 404:
                 return []
             elif response.status_code == 429:
-                if attempt < max_retries:
+                if attempt < MAX_RETRIES:
                     await self.sleep(backoff)
                     backoff *= 2.0
                     continue

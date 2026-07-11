@@ -1,9 +1,8 @@
-import json
 from datetime import datetime
 from pathlib import Path
 
-from pitwall.openf1.errors import ReplayDataError
 from pitwall.openf1.models import LocationPoint, parse_location
+from pitwall.openf1.replay import _read_json
 
 
 def load_location(path: Path) -> list[LocationPoint]:
@@ -15,24 +14,14 @@ def load_location(path: Path) -> list[LocationPoint]:
     location_path = path / "location.json"
     if not location_path.exists():
         return []
-    try:
-        with open(location_path, encoding="utf-8") as f:
-            data = json.load(f)
-    except json.JSONDecodeError as e:
-        raise ReplayDataError(f"Invalid JSON in location.json: {e}") from e  # noqa: TRY003
-    return parse_location(data)
+    return parse_location(_read_json(location_path))
 
 
 def load_location_all(path: Path) -> list[LocationPoint]:
     """Load and parse location points from location_all.json if present, falling back to location.json."""
     location_all_path = path / "location_all.json"
     if location_all_path.exists():
-        try:
-            with open(location_all_path, encoding="utf-8") as f:
-                data = json.load(f)
-        except json.JSONDecodeError as e:
-            raise ReplayDataError(f"Invalid JSON in location_all.json: {e}") from e  # noqa: TRY003
-        return parse_location(data)
+        return parse_location(_read_json(location_all_path))
     return load_location(path)
 
 

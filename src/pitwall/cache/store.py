@@ -7,6 +7,7 @@ from typing import Any
 
 from pitwall.api.jolpica import JolpicaClient
 from pitwall.cache.db import (
+    _fetchall,
     from_db_datetime,
     get_refresh_log_metadata,
     select_constructor_standings,
@@ -61,29 +62,16 @@ class SeasonStore:
         Invariant: For results scope, only the target round's sessions are evaluated.
         Invariant: For season-wide scopes, all sessions scheduled for the season are evaluated.
         """
-        cursor = self.db.cursor()
-        try:
-            if round_num is not None:
-                cursor.execute(
-                    """
-                    SELECT start, fp1, fp2, fp3, qualifying, sprint, sprint_qualifying
-                    FROM races
-                    WHERE season = ? AND round = ?
-                    """,
-                    (season, round_num),
-                )
-            else:
-                cursor.execute(
-                    """
-                    SELECT start, fp1, fp2, fp3, qualifying, sprint, sprint_qualifying
-                    FROM races
-                    WHERE season = ?
-                    """,
-                    (season,),
-                )
-            rows = cursor.fetchall()
-        finally:
-            cursor.close()
+        sql = """
+            SELECT start, fp1, fp2, fp3, qualifying, sprint, sprint_qualifying
+            FROM races
+            WHERE season = ?
+            """
+        params: list[int] = [season]
+        if round_num is not None:
+            sql += " AND round = ?"
+            params.append(round_num)
+        rows = _fetchall(self.db, sql, tuple(params))
 
         starts = []
         # Loop Bound: Constrained by number of race rows and session columns (PoT #2).

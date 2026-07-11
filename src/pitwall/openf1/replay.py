@@ -3,10 +3,11 @@ import json
 import math
 from collections.abc import AsyncIterator, Awaitable, Callable
 from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
+from pitwall.errors import DataParseError
 from pitwall.openf1.errors import ReplayDataError
 from pitwall.openf1.models import (
     IntervalPoint,
@@ -23,6 +24,7 @@ from pitwall.openf1.models import (
     parse_position,
     parse_race_control,
     parse_stints,
+    parse_timestamp,
 )
 
 TICK_INTERVAL_S = 0.5
@@ -67,6 +69,15 @@ class TickSource(Protocol):
     def ticks(self) -> AsyncIterator[ReplayTick]: ...
 
 
+def _read_json(file_path: Path) -> Any:
+    """Read and decode a JSON file, raising ReplayDataError naming the file on invalid JSON."""
+    try:
+        with open(file_path, encoding="utf-8") as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        raise ReplayDataError(f"Invalid JSON in {file_path.name}: {e}") from e  # noqa: TRY003
+
+
 def _read_replay_start(path: Path) -> datetime | None:
     """Read and parse replay start timestamp from manifest.json."""
     # Safety containment wrapper for reading replay_start from manifest.json.
@@ -79,23 +90,20 @@ def _read_replay_start(path: Path) -> datetime | None:
     try:
         with open(manifest_path, encoding="utf-8") as f:
             manifest_data = json.load(f)
-        if isinstance(manifest_data, dict):
-            window = manifest_data.get("replay_window", {})
-            if isinstance(window, dict) and "start" in window:
-                start_val = window["start"]
-                if isinstance(start_val, str):
-                    replay_start = datetime.fromisoformat(start_val)
-                    if replay_start.tzinfo is None:
-                        replay_start = replay_start.replace(tzinfo=UTC)
-                    return replay_start
-    except (OSError, json.JSONDecodeError, ValueError, TypeError):
+    except (OSError, json.JSONDecodeError):
         return None
+    if isinstance(manifest_data, dict):
+        window = manifest_data.get("replay_window", {})
+        if isinstance(window, dict) and "start" in window:
+            try:
+                return parse_timestamp(window["start"], "replay_window.start")
+            except DataParseError:
+                return None
     return None
 
 
 def load_session(path: Path) -> ReplaySession:
     """Load and parse F1 timing streams from a directory."""
-    required = ["drivers", "stints", "laps", "position", "intervals", "pit", "race_control"]
     parsers: dict[str, Callable[[Any], list[Any]]] = {
         "drivers": parse_drivers,
         "stints": parse_stints,
@@ -106,16 +114,11 @@ def load_session(path: Path) -> ReplaySession:
         "race_control": parse_race_control,
     }
     loaded = {}
-    for name in required:
+    for name, parser in parsers.items():
         file_path = path / f"{name}.json"
         if not file_path.exists():
             raise ReplayDataError(f"Missing required file: {name}.json")  # noqa: TRY003
-        try:
-            with open(file_path, encoding="utf-8") as f:
-                data = json.load(f)
-        except json.JSONDecodeError as e:
-            raise ReplayDataError(f"Invalid JSON in {name}.json: {e}") from e  # noqa: TRY003
-        loaded[name] = parsers[name](data)
+        loaded[name] = parser(_read_json(file_path))
 
     replay_start = _read_replay_start(path)
 
@@ -203,24 +206,19 @@ class ReplayEngine:
 
         event_idx = 0
         num_events = len(self.events)
-        prev_playhead = t0
+        # None on the first tick: everything at or before t0 is drained without
+        # the strictly-greater filter, matching the previous two-branch drain.
+        prev_playhead: datetime | None = None
 
         for k in range(tick_count):
             await self.sleep(self.tick_interval_s)
 
-            if k == 0:
-                playhead = t0
-                tick_events = []
-                while event_idx < num_events and self.events[event_idx].ts <= t0:
+            playhead = t0 if k == 0 else t0 + k * step
+            tick_events = []
+            while event_idx < num_events and self.events[event_idx].ts <= playhead:
+                if prev_playhead is None or self.events[event_idx].ts > prev_playhead:
                     tick_events.append(self.events[event_idx])
-                    event_idx += 1
-            else:
-                playhead = t0 + k * step
-                tick_events = []
-                while event_idx < num_events and self.events[event_idx].ts <= playhead:
-                    if self.events[event_idx].ts > prev_playhead:
-                        tick_events.append(self.events[event_idx])
-                    event_idx += 1
-                prev_playhead = playhead
+                event_idx += 1
+            prev_playhead = playhead
 
             yield ReplayTick(index=k, playhead=playhead, events=tuple(tick_events))

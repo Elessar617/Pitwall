@@ -1,5 +1,6 @@
 import functools
 import math
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
@@ -149,149 +150,148 @@ def _openf1_parse_boundary(fn):
     return wrapper
 
 
-@_openf1_parse_boundary
-def parse_drivers(data: Any) -> list[SessionDriver]:
-    """Parse list of driver dictionaries into SessionDriver instances."""
+def _parse_records(data: Any, list_name: str, entity: str, build: Callable[[dict[str, Any]], Any]) -> list[Any]:
+    """Validate list-of-dict shape and build one record per element.
+
+    Shared scaffolding for the per-stream parsers; error behavior is identical
+    to the previously inlined loops.
+    """
+    # Loop Bound: bounded by length of data list.
+    # Failure Modes: raises DataParseError if data is not a list, if any element
+    # is not a dict, or if build rejects an element's fields.
     if not isinstance(data, list):
-        raise DataParseError.expected_list("drivers", type(data).__name__)
+        raise DataParseError.expected_list(list_name, type(data).__name__)
     result = []
     for d in data:
         if not isinstance(d, dict):
-            raise DataParseError.expected_dict("driver")
-        result.append(
-            SessionDriver(
-                driver_number=coerce_int(get_required(d, "driver_number", "driver"), "driver_number"),
-                name_acronym=coerce_required_string(get_required(d, "name_acronym", "driver"), "name_acronym"),
-                full_name=coerce_required_string(get_required(d, "full_name", "driver"), "full_name"),
-                team_name=coerce_required_string(get_required(d, "team_name", "driver"), "team_name"),
-                team_colour=_optional_string(d.get("team_colour"), "team_colour"),
-            )
-        )
+            raise DataParseError.expected_dict(entity)
+        result.append(build(d))
     return result
+
+
+def _required_timestamp(d: dict[str, Any], field: str, entity: str) -> datetime:
+    """Extract a required, non-empty field and parse it as a timestamp."""
+    val = get_required(d, field, entity)
+    if val is None or val == "":
+        raise DataParseError.malformed_coercion("datetime", field, val)
+    return parse_timestamp(val, field)
+
+
+@_openf1_parse_boundary
+def parse_drivers(data: Any) -> list[SessionDriver]:
+    """Parse list of driver dictionaries into SessionDriver instances."""
+    return _parse_records(
+        data,
+        "drivers",
+        "driver",
+        lambda d: SessionDriver(
+            driver_number=coerce_int(get_required(d, "driver_number", "driver"), "driver_number"),
+            name_acronym=coerce_required_string(get_required(d, "name_acronym", "driver"), "name_acronym"),
+            full_name=coerce_required_string(get_required(d, "full_name", "driver"), "full_name"),
+            team_name=coerce_required_string(get_required(d, "team_name", "driver"), "team_name"),
+            team_colour=_optional_string(d.get("team_colour"), "team_colour"),
+        ),
+    )
 
 
 @_openf1_parse_boundary
 def parse_stints(data: Any) -> list[Stint]:
     """Parse list of stint dictionaries into Stint instances."""
-    if not isinstance(data, list):
-        raise DataParseError.expected_list("stints", type(data).__name__)
-    result = []
-    for d in data:
-        if not isinstance(d, dict):
-            raise DataParseError.expected_dict("stint")
-        result.append(
-            Stint(
-                driver_number=coerce_int(get_required(d, "driver_number", "stint"), "driver_number"),
-                stint_number=coerce_int(get_required(d, "stint_number", "stint"), "stint_number"),
-                compound=_optional_string(d.get("compound"), "compound"),
-                lap_start=coerce_int(get_required(d, "lap_start", "stint"), "lap_start"),
-                lap_end=coerce_int(get_required(d, "lap_end", "stint"), "lap_end"),
-                tyre_age_at_start=coerce_optional_int(d.get("tyre_age_at_start"), "tyre_age_at_start"),
-            )
-        )
-    return result
+    return _parse_records(
+        data,
+        "stints",
+        "stint",
+        lambda d: Stint(
+            driver_number=coerce_int(get_required(d, "driver_number", "stint"), "driver_number"),
+            stint_number=coerce_int(get_required(d, "stint_number", "stint"), "stint_number"),
+            compound=_optional_string(d.get("compound"), "compound"),
+            lap_start=coerce_int(get_required(d, "lap_start", "stint"), "lap_start"),
+            lap_end=coerce_int(get_required(d, "lap_end", "stint"), "lap_end"),
+            tyre_age_at_start=coerce_optional_int(d.get("tyre_age_at_start"), "tyre_age_at_start"),
+        ),
+    )
 
 
 @_openf1_parse_boundary
 def parse_laps(data: Any) -> list[Lap]:
     """Parse list of lap dictionaries into Lap instances."""
-    if not isinstance(data, list):
-        raise DataParseError.expected_list("laps", type(data).__name__)
-    result = []
-    for d in data:
-        if not isinstance(d, dict):
-            raise DataParseError.expected_dict("lap")
-        result.append(
-            Lap(
-                driver_number=coerce_int(get_required(d, "driver_number", "lap"), "driver_number"),
-                lap_number=coerce_int(get_required(d, "lap_number", "lap"), "lap_number"),
-                date_start=parse_optional_timestamp(d.get("date_start"), "date_start"),
-                lap_duration=_optional_float(d.get("lap_duration"), "lap_duration"),
-            )
-        )
-    return result
+    return _parse_records(
+        data,
+        "laps",
+        "lap",
+        lambda d: Lap(
+            driver_number=coerce_int(get_required(d, "driver_number", "lap"), "driver_number"),
+            lap_number=coerce_int(get_required(d, "lap_number", "lap"), "lap_number"),
+            date_start=parse_optional_timestamp(d.get("date_start"), "date_start"),
+            lap_duration=_optional_float(d.get("lap_duration"), "lap_duration"),
+        ),
+    )
 
 
 @_openf1_parse_boundary
 def parse_position(data: Any) -> list[PositionUpdate]:
     """Parse list of position dictionaries into PositionUpdate instances."""
-    if not isinstance(data, list):
-        raise DataParseError.expected_list("position", type(data).__name__)
-    result = []
-    for d in data:
-        if not isinstance(d, dict):
-            raise DataParseError.expected_dict("position")
-        result.append(
-            PositionUpdate(
-                date=parse_timestamp(get_required(d, "date", "position"), "date"),
-                driver_number=coerce_int(get_required(d, "driver_number", "position"), "driver_number"),
-                position=coerce_int(get_required(d, "position", "position"), "position"),
-            )
-        )
-    return result
+    return _parse_records(
+        data,
+        "position",
+        "position",
+        lambda d: PositionUpdate(
+            date=parse_timestamp(get_required(d, "date", "position"), "date"),
+            driver_number=coerce_int(get_required(d, "driver_number", "position"), "driver_number"),
+            position=coerce_int(get_required(d, "position", "position"), "position"),
+        ),
+    )
 
 
 @_openf1_parse_boundary
 def parse_intervals(data: Any) -> list[IntervalPoint]:
     """Parse list of interval dictionaries into IntervalPoint instances."""
-    if not isinstance(data, list):
-        raise DataParseError.expected_list("intervals", type(data).__name__)
-    result = []
-    for d in data:
-        if not isinstance(d, dict):
-            raise DataParseError.expected_dict("interval")
-        result.append(
-            IntervalPoint(
-                date=parse_timestamp(get_required(d, "date", "interval"), "date"),
-                driver_number=coerce_int(get_required(d, "driver_number", "interval"), "driver_number"),
-                gap_to_leader=_gap_value(d.get("gap_to_leader"), "gap_to_leader"),
-                interval=_gap_value(d.get("interval"), "interval"),
-            )
-        )
-    return result
+    return _parse_records(
+        data,
+        "intervals",
+        "interval",
+        lambda d: IntervalPoint(
+            date=parse_timestamp(get_required(d, "date", "interval"), "date"),
+            driver_number=coerce_int(get_required(d, "driver_number", "interval"), "driver_number"),
+            gap_to_leader=_gap_value(d.get("gap_to_leader"), "gap_to_leader"),
+            interval=_gap_value(d.get("interval"), "interval"),
+        ),
+    )
 
 
 @_openf1_parse_boundary
 def parse_pit(data: Any) -> list[PitStop]:
     """Parse list of pit stop dictionaries into PitStop instances."""
-    if not isinstance(data, list):
-        raise DataParseError.expected_list("pit", type(data).__name__)
-    result = []
-    for d in data:
-        if not isinstance(d, dict):
-            raise DataParseError.expected_dict("pit")
-        result.append(
-            PitStop(
-                date=parse_timestamp(get_required(d, "date", "pit"), "date"),
-                driver_number=coerce_int(get_required(d, "driver_number", "pit"), "driver_number"),
-                lap_number=coerce_optional_int(d.get("lap_number"), "lap_number"),
-                pit_duration=_optional_float(d.get("pit_duration"), "pit_duration"),
-            )
-        )
-    return result
+    return _parse_records(
+        data,
+        "pit",
+        "pit",
+        lambda d: PitStop(
+            date=parse_timestamp(get_required(d, "date", "pit"), "date"),
+            driver_number=coerce_int(get_required(d, "driver_number", "pit"), "driver_number"),
+            lap_number=coerce_optional_int(d.get("lap_number"), "lap_number"),
+            pit_duration=_optional_float(d.get("pit_duration"), "pit_duration"),
+        ),
+    )
 
 
 @_openf1_parse_boundary
 def parse_race_control(data: Any) -> list[RaceControlMessage]:
     """Parse list of race control dictionaries into RaceControlMessage instances."""
-    if not isinstance(data, list):
-        raise DataParseError.expected_list("race_control", type(data).__name__)
-    result = []
-    for d in data:
-        if not isinstance(d, dict):
-            raise DataParseError.expected_dict("race_control")
-        result.append(
-            RaceControlMessage(
-                date=parse_timestamp(get_required(d, "date", "race_control"), "date"),
-                message=coerce_required_string(get_required(d, "message", "race_control"), "message"),
-                category=_optional_string(d.get("category"), "category"),
-                flag=_optional_string(d.get("flag"), "flag"),
-                scope=_optional_string(d.get("scope"), "scope"),
-                lap_number=coerce_optional_int(d.get("lap_number"), "lap_number"),
-                driver_number=coerce_optional_int(d.get("driver_number"), "driver_number"),
-            )
-        )
-    return result
+    return _parse_records(
+        data,
+        "race_control",
+        "race_control",
+        lambda d: RaceControlMessage(
+            date=parse_timestamp(get_required(d, "date", "race_control"), "date"),
+            message=coerce_required_string(get_required(d, "message", "race_control"), "message"),
+            category=_optional_string(d.get("category"), "category"),
+            flag=_optional_string(d.get("flag"), "flag"),
+            scope=_optional_string(d.get("scope"), "scope"),
+            lap_number=coerce_optional_int(d.get("lap_number"), "lap_number"),
+            driver_number=coerce_optional_int(d.get("driver_number"), "driver_number"),
+        ),
+    )
 
 
 @dataclass(frozen=True)
@@ -309,21 +309,17 @@ def parse_location(data: Any) -> list[LocationPoint]:
     # Invariants: x and y coordinates are finite floats representing track coordinates.
     # Failure Modes: throws DataParseError if data is not list, or if required fields are missing,
     # or if coordinates are non-finite or boolean values.
-    if not isinstance(data, list):
-        raise DataParseError.expected_list("location", type(data).__name__)
-    result = []
-    for d in data:
-        if not isinstance(d, dict):
-            raise DataParseError.expected_dict("location")
-        result.append(
-            LocationPoint(
-                date=parse_timestamp(get_required(d, "date", "location"), "date"),
-                driver_number=coerce_int(get_required(d, "driver_number", "location"), "driver_number"),
-                x=coerce_float(get_required(d, "x", "location"), "x"),
-                y=coerce_float(get_required(d, "y", "location"), "y"),
-            )
-        )
-    return result
+    return _parse_records(
+        data,
+        "location",
+        "location",
+        lambda d: LocationPoint(
+            date=parse_timestamp(get_required(d, "date", "location"), "date"),
+            driver_number=coerce_int(get_required(d, "driver_number", "location"), "driver_number"),
+            x=coerce_float(get_required(d, "x", "location"), "x"),
+            y=coerce_float(get_required(d, "y", "location"), "y"),
+        ),
+    )
 
 
 @dataclass(frozen=True)
@@ -343,33 +339,15 @@ def parse_sessions(data: Any) -> list[Session]:
     # a non-empty name string, and timezone-aware datetimes for date_start and date_end.
     # Failure Modes: Raises DataParseError if data is not a list, if any list element is not a dict,
     # if required keys are missing, if types cannot be coerced, or if datetime strings are malformed.
-    if not isinstance(data, list):
-        raise DataParseError.expected_list("sessions", type(data).__name__)
-    result = []
-    for d in data:
-        if not isinstance(d, dict):
-            raise DataParseError.expected_dict("session")
-        session_key = coerce_int(get_required(d, "session_key", "session"), "session_key")
-        meeting_key = coerce_int(get_required(d, "meeting_key", "session"), "meeting_key")
-        session_name = coerce_required_string(get_required(d, "session_name", "session"), "session_name")
-
-        date_start_val = get_required(d, "date_start", "session")
-        if date_start_val is None or date_start_val == "":
-            raise DataParseError.malformed_coercion("datetime", "date_start", date_start_val)
-        date_start = parse_timestamp(date_start_val, "date_start")
-
-        date_end_val = get_required(d, "date_end", "session")
-        if date_end_val is None or date_end_val == "":
-            raise DataParseError.malformed_coercion("datetime", "date_end", date_end_val)
-        date_end = parse_timestamp(date_end_val, "date_end")
-
-        result.append(
-            Session(
-                session_key=session_key,
-                meeting_key=meeting_key,
-                session_name=session_name,
-                date_start=date_start,
-                date_end=date_end,
-            )
-        )
-    return result
+    return _parse_records(
+        data,
+        "sessions",
+        "session",
+        lambda d: Session(
+            session_key=coerce_int(get_required(d, "session_key", "session"), "session_key"),
+            meeting_key=coerce_int(get_required(d, "meeting_key", "session"), "meeting_key"),
+            session_name=coerce_required_string(get_required(d, "session_name", "session"), "session_name"),
+            date_start=_required_timestamp(d, "date_start", "session"),
+            date_end=_required_timestamp(d, "date_end", "session"),
+        ),
+    )

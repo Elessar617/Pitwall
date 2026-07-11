@@ -1,5 +1,6 @@
 import datetime
 import math
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
@@ -120,20 +121,8 @@ def coerce_optional_int(val: Any, field_name: str) -> int | None:
     """Coerce value to an integer or None if empty/null, raising DataParseError on failure."""
     if val is None or val == "":
         return None
-    if isinstance(val, bool):
-        # Invariant: boolean values must not be coerced to integers.
-        raise DataParseError.malformed_coercion("integer", field_name, val)
-    try:
-        if isinstance(val, (int, float)):
-            # Invariant: non-finite numeric floats (nan/inf) must raise DataParseError.
-            if not math.isfinite(val):
-                raise DataParseError.malformed_coercion("integer", field_name, val)
-            # Assumption: numeric inputs must not have a fractional part.
-            if val != int(val):
-                raise DataParseError.malformed_coercion("integer", field_name, val)
-        return int(val)
-    except (ValueError, TypeError, OverflowError) as e:
-        raise DataParseError.malformed_coercion("integer", field_name, val) from e
+    # Invariant: non-null values obey the same bool/nan/inf/fractional rejections as coerce_int.
+    return coerce_int(val, field_name)
 
 
 def coerce_float(val: Any, field_name: str) -> float:
@@ -158,13 +147,9 @@ def coerce_position(val: Any) -> int | None:
         raise DataParseError.malformed_coercion("integer", "position", val)
     try:
         if isinstance(val, (int, float)):
-            # Invariant: non-finite numeric positions (nan/inf) must raise DataParseError.
-            if not math.isfinite(val):
-                raise DataParseError.malformed_coercion("integer", "position", val)
-            # Assumption: numeric inputs must be whole numbers.
-            if val != int(val):
-                raise DataParseError.malformed_coercion("integer", "position", val)
-            return int(val)
+            # Invariant: numeric positions obey coerce_int's nan/inf/fractional rejections
+            # (DataParseError propagates directly; it is not re-wrapped by the except below).
+            return coerce_int(val, "position")
         if isinstance(val, str):
             try:
                 return int(val)
@@ -234,7 +219,7 @@ def _unwrap_envelope(payload: dict, table_key: str, list_key: str) -> list[dict]
         raise DataParseError.missing_table(table_key)
     table = mr_data[table_key]
     if not isinstance(table, dict) or list_key not in table:
-        raise DataParseError.missing_list(list_key, table_key)
+        raise DataParseError.missing_container(list_key, table_key)
     items = table[list_key]
     if not isinstance(items, list):
         raise DataParseError.expected_list(list_key, type(items).__name__)
@@ -515,38 +500,31 @@ def parse_races(payload: dict) -> list[Race]:
     return [_parse_race(item) for item in items]
 
 
-def parse_driver_standings(payload: dict) -> list[DriverStanding]:
-    """Parse a list of DriverStanding objects from the standard API payload."""
+def _parse_standings_lists[T](payload: dict, key: str, parse_item: Callable[[dict], T]) -> list[T]:
+    """Unwrap StandingsLists entries and parse each entry's `key` list with parse_item."""
     lists = _unwrap_envelope(payload, "StandingsTable", "StandingsLists")
     result = []
     for s_list in lists:
         if not isinstance(s_list, dict):
             raise DataParseError.expected_standings_lists_entry()
-        if "DriverStandings" not in s_list:
-            raise DataParseError.missing_container("DriverStandings", "StandingsLists entry")
-        driver_standings = s_list["DriverStandings"]
-        if not isinstance(driver_standings, list):
-            raise DataParseError.expected_list_for("DriverStandings")
-        for item in driver_standings:
-            result.append(_parse_driver_standing(item))
+        if key not in s_list:
+            raise DataParseError.missing_container(key, "StandingsLists entry")
+        standings = s_list[key]
+        if not isinstance(standings, list):
+            raise DataParseError.expected_list_for(key)
+        for item in standings:
+            result.append(parse_item(item))
     return result
+
+
+def parse_driver_standings(payload: dict) -> list[DriverStanding]:
+    """Parse a list of DriverStanding objects from the standard API payload."""
+    return _parse_standings_lists(payload, "DriverStandings", _parse_driver_standing)
 
 
 def parse_constructor_standings(payload: dict) -> list[ConstructorStanding]:
     """Parse a list of ConstructorStanding objects from the standard API payload."""
-    lists = _unwrap_envelope(payload, "StandingsTable", "StandingsLists")
-    result = []
-    for s_list in lists:
-        if not isinstance(s_list, dict):
-            raise DataParseError.expected_standings_lists_entry()
-        if "ConstructorStandings" not in s_list:
-            raise DataParseError.missing_container("ConstructorStandings", "StandingsLists entry")
-        constructor_standings = s_list["ConstructorStandings"]
-        if not isinstance(constructor_standings, list):
-            raise DataParseError.expected_list_for("ConstructorStandings")
-        for item in constructor_standings:
-            result.append(_parse_constructor_standing(item))
-    return result
+    return _parse_standings_lists(payload, "ConstructorStandings", _parse_constructor_standing)
 
 
 def parse_results(payload: dict) -> list[RaceResult]:

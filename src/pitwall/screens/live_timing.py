@@ -141,14 +141,12 @@ class LiveTimingScreen(PitwallScreen):
 
     def compose_body(self) -> ComposeResult:
         if self.app.config.live:
-            yield Static("Connecting to live session…", id="live-status")
+            msg = "Connecting to live session…"
         elif self.app.config.replay_dir:
-            yield Static("Loading replay…", id="live-status")
+            msg = "Loading replay…"
         else:
-            yield Static(
-                "No live session — start pitwall with --live or --replay <fixtures-dir>.",
-                id="live-status",
-            )
+            msg = "No live session — start pitwall with --live or --replay <fixtures-dir>."
+        yield Static(msg, id="live-status")
         with Horizontal(id="live-body"):
             table = DataTable(id="live-table")
             table.display = False
@@ -199,6 +197,30 @@ class LiveTimingScreen(PitwallScreen):
         table.clear(columns=True)
         table.add_columns("Pos", "Drv", "Int", "Gap", "Last", "Tyre")
 
+    def _apply_map_layout(self, table: DataTable, map_widget: Static) -> None:
+        """Show the map beside the tower only when the terminal is wide enough."""
+        if self.size.width >= MAP_MIN_SPLIT_WIDTH:
+            map_widget.display = True
+            table.remove_class("tower-only")
+        else:
+            map_widget.display = False
+            table.add_class("tower-only")
+
+    def _show_unavailable(
+        self,
+        message: str,
+        status: Static,
+        table: DataTable,
+        map_widget: Static,
+        exc: Exception | None = None,
+    ) -> None:
+        """Show an unavailable status, hide data widgets, and optionally notify."""
+        status.update(message)
+        table.display = False
+        map_widget.display = False
+        if exc is not None:
+            self.app.notify(str(exc), severity="error")
+
     def action_cycle_view(self) -> None:
         table = self.query_one("#live-table", DataTable)
         if not table.display:
@@ -207,9 +229,7 @@ class LiveTimingScreen(PitwallScreen):
         self._refresh_display()
 
     def _is_data_bearing(self, status_str: str) -> bool:
-        return (
-            status_str.startswith("Replay ") or status_str.startswith("Live · ") or status_str.startswith("Live ended ")
-        )
+        return status_str.startswith(("Replay ", "Live · ", "Live ended "))
 
     def _get_status_text(self, base_status: str) -> rich.text.Text:
         # SEC-1: the live status embeds replay/API-sourced session_name; render
@@ -266,22 +286,18 @@ class LiveTimingScreen(PitwallScreen):
                 self._styles,
             )
             map_widget.update(map_content)
+            title, subtitle = "", ""
             if map_widget.display:
-                map_widget.border_title = "Track"
+                title = "Track"
                 # NASA style comment:
                 # Invariant: caption playhead is extracted from the data-bearing status
                 # to prevent clock drift/desynchronization between the status and the map.
                 if hasattr(self, "_status_base"):
                     time_match = re.search(r"\b\d{2}:\d{2}:\d{2}\b", self._status_base)
                     if time_match:
-                        map_widget.border_subtitle = f"Montreal · {time_match.group(0)} UTC"
-                    else:
-                        map_widget.border_subtitle = ""
-                else:
-                    map_widget.border_subtitle = ""
-            else:
-                map_widget.border_title = ""
-                map_widget.border_subtitle = ""
+                        subtitle = f"Montreal · {time_match.group(0)} UTC"
+            map_widget.border_title = title
+            map_widget.border_subtitle = subtitle
 
     @work(exclusive=True, group="live-replay")
     async def _replay_worker(self) -> None:
@@ -301,16 +317,11 @@ class LiveTimingScreen(PitwallScreen):
             events = merge_events(session)
             location_points = await asyncio.to_thread(load_location_all, Path(replay_dir))
         except (ReplayDataError, DataParseError, OSError) as exc:
-            status.update("Replay unavailable — failed to load replay data.")
-            table.display = False
-            map_widget.display = False
-            self.app.notify(str(exc), severity="error")
+            self._show_unavailable("Replay unavailable — failed to load replay data.", status, table, map_widget, exc)
             return
 
         if not events:
-            status.update("Replay unavailable — replay data contains no events.")
-            table.display = False
-            map_widget.display = False
+            self._show_unavailable("Replay unavailable — replay data contains no events.", status, table, map_widget)
             return
 
         engine = ReplayEngine(
@@ -349,12 +360,8 @@ class LiveTimingScreen(PitwallScreen):
 
             if not table.display:
                 table.display = True
-                if has_map and self.size.width >= MAP_MIN_SPLIT_WIDTH:
-                    map_widget.display = True
-                    table.remove_class("tower-only")
-                else:
-                    map_widget.display = False
-                    table.add_class("tower-only")
+                if has_map:
+                    self._apply_map_layout(table, map_widget)
 
             speed_str = format_speed(self.app.config.replay_speed)
             self._status_base = f"Replay {speed_str} · {tick.playhead.strftime('%H:%M:%S')} UTC"
@@ -410,12 +417,7 @@ class LiveTimingScreen(PitwallScreen):
                         self._projection = build_projection(location_points)
                         self._outline = build_outline(location_points, self._projection)
                         self._has_map = True
-                        if self.size.width >= MAP_MIN_SPLIT_WIDTH:
-                            map_widget.display = True
-                            table.remove_class("tower-only")
-                        else:
-                            map_widget.display = False
-                            table.add_class("tower-only")
+                        self._apply_map_layout(table, map_widget)
 
                 if self._has_map:
                     self._markers = source.latest_location()
@@ -455,9 +457,7 @@ class LiveTimingScreen(PitwallScreen):
             async with OpenF1Client(transport=self.app.openf1_transport) as client:
                 sessions = await client.get_sessions("latest")
                 if not sessions:
-                    status.update("Live unavailable — no session found.")
-                    table.display = False
-                    map_widget.display = False
+                    self._show_unavailable("Live unavailable — no session found.", status, table, map_widget)
                     return
                 session = sessions[-1]
                 now = self.app.clock()
@@ -468,7 +468,4 @@ class LiveTimingScreen(PitwallScreen):
 
                 await self._run_live_loop(client, session, status, table, map_widget)
         except OpenF1Error as exc:
-            status.update("Live unavailable — could not reach OpenF1.")
-            table.display = False
-            map_widget.display = False
-            self.app.notify(str(exc), severity="error")
+            self._show_unavailable("Live unavailable — could not reach OpenF1.", status, table, map_widget, exc)

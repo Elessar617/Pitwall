@@ -101,16 +101,8 @@ def build_outline(points: Sequence[LocationPoint], proj: MapProjection) -> tuple
         if 0 <= col < MAP_GRID_WIDTH and 0 <= row < MAP_GRID_HEIGHT:
             grid[row][col] |= BIT_MAP[(dx, dy)]
 
-    lines = []
-    # Loop Bound: 32 rows.
-    for r in range(MAP_GRID_HEIGHT):
-        row_chars = []
-        # Loop Bound: 56 columns.
-        for c in range(MAP_GRID_WIDTH):
-            row_chars.append(chr(0x2800 + grid[r][c]))
-        lines.append("".join(row_chars))
-
-    return tuple(lines)
+    # Loop Bound: 32 rows x 56 columns (MAP_GRID_HEIGHT x MAP_GRID_WIDTH).
+    return tuple("".join(chr(0x2800 + cell) for cell in row) for row in grid)
 
 
 def marker_cells(

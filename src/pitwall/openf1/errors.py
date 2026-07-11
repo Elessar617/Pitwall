@@ -28,10 +28,8 @@ class OpenF1NetworkError(OpenF1Error):
     """Exception raised for transport-level errors when communicating with the OpenF1 API."""
 
     def __init__(self, cause: Exception | str | None = None) -> None:
-        if cause:
-            super().__init__(f"Transport error communicating with OpenF1 API: {cause}")
-        else:
-            super().__init__("Transport error communicating with OpenF1 API")
+        suffix = f": {cause}" if cause else ""
+        super().__init__(f"Transport error communicating with OpenF1 API{suffix}")
 
 
 class OpenF1DataError(DataParseError, OpenF1Error):

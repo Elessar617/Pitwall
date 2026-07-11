@@ -6,18 +6,12 @@ from textual import work
 from textual.app import ComposeResult
 from textual.widgets import DataTable, Static
 
+from pitwall.cache.store import Source
 from pitwall.errors import JolpicaError
 from pitwall.models import Race, RaceResult
-from pitwall.screens.base import PitwallScreen
+from pitwall.screens.base import PitwallScreen, StoreNotInitializedError
 from pitwall.screens.cells import EM_DASH, format_points, safe_row
 from pitwall.workers.season import SeasonSnapshot
-
-
-class StoreNotInitializedError(RuntimeError):
-    """Exception raised when the store is not initialized on the app."""
-
-    def __init__(self) -> None:
-        super().__init__("App store is not initialized")
 
 
 class ResultsScreen(PitwallScreen):
@@ -75,9 +69,7 @@ class ResultsScreen(PitwallScreen):
             status.update(f"No rounds available for season {self.app.config.season}.")
             status.display = True
             rounds_table.display = False
-            self.query_one("#results-detail-title", Static).display = False
-            self.query_one("#results-detail-status", Static).display = False
-            self.query_one("#results-table", DataTable).display = False
+            self._hide_detail()
             return
 
         self._races = sorted(races, key=lambda r: r.round)
@@ -107,9 +99,12 @@ class ResultsScreen(PitwallScreen):
             self._fetch_results(self.app.config.season, race.round)
         else:
             # Pin the detail widgets hidden in pre-season state when no round is selected.
-            self.query_one("#results-detail-title", Static).display = False
-            self.query_one("#results-detail-status", Static).display = False
-            self.query_one("#results-table", DataTable).display = False
+            self._hide_detail()
+
+    def _hide_detail(self) -> None:
+        self.query_one("#results-detail-title", Static).display = False
+        self.query_one("#results-detail-status", Static).display = False
+        self.query_one("#results-table", DataTable).display = False
 
     def _render_error(self, error: str | None) -> None:
         if error is None:
@@ -120,9 +115,7 @@ class ResultsScreen(PitwallScreen):
         status.display = True
 
         self.query_one("#results-rounds-table", DataTable).display = False
-        self.query_one("#results-detail-title", Static).display = False
-        self.query_one("#results-detail-status", Static).display = False
-        self.query_one("#results-table", DataTable).display = False
+        self._hide_detail()
 
     def on_data_table_row_highlighted(self, event: DataTable.RowHighlighted) -> None:
         table = event.data_table
@@ -192,8 +185,6 @@ class ResultsScreen(PitwallScreen):
             detail_status.display = False
             results_table.display = True
 
-            from pitwall.cache.store import Source
-
             if store_res.source == Source.STALE_CACHE:
                 as_of = f"{store_res.fetched_at:%H:%M}"
                 self.app.notify(
@@ -226,11 +217,8 @@ def build_result_rows(results: list[RaceResult]) -> list[tuple[str, ...]]:
 
 def build_round_rows(races: list[Race]) -> list[tuple[str, str]]:
     """Pure round-table rows, sorted by round ascending (AC-3)."""
-    rows = []
     # Loop bound: len(races) <= one API page (PoT #2).
-    for race in sorted(races, key=lambda r: r.round):
-        rows.append((str(race.round), race.race_name))
-    return rows
+    return [(str(race.round), race.race_name) for race in sorted(races, key=lambda r: r.round)]
 
 
 def default_round_index(races: list[Race], now: datetime.datetime) -> int | None:

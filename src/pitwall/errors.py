@@ -45,10 +45,6 @@ class DataParseError(JolpicaError):
         return cls(f"Missing '{table_key}' in MRData envelope")
 
     @classmethod
-    def missing_list(cls, list_key: str, table_key: str) -> "DataParseError":
-        return cls(f"Missing '{list_key}' in {table_key}")
-
-    @classmethod
     def expected_list(cls, list_key: str, got_type: str) -> "DataParseError":
         return cls(f"Expected list for '{list_key}', got {got_type}")
 
@@ -97,10 +93,6 @@ class DataParseError(JolpicaError):
     @classmethod
     def expected_constructors_list(cls) -> "DataParseError":
         return cls("Expected list for Constructors in DriverStanding")
-
-    @classmethod
-    def expected_dict_entry(cls, entry_name: str) -> "DataParseError":
-        return cls(f"Expected dictionary for {entry_name}")
 
     @classmethod
     def missing_container(cls, container: str, parent: str) -> "DataParseError":
