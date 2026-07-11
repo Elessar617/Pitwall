@@ -1,25 +1,27 @@
-/* Pitwall palette: terminal-dark with the telemetry-green accent. */
+/* Pitwall palette: Tanwë Iron field with the copper/ember accent.
+   Values come from tanwe-brand/tokens (deepIron, ironInk, vellum, oldSilver,
+   ember) — hairline lines, no shadows, no radius, per the brand posture. */
 :root {
-  --md-primary-fg-color: #0c1116;
-  --md-primary-fg-color--light: #11181f;
-  --md-primary-fg-color--dark: #0c1116;
-  --md-accent-fg-color: #3fdfa0;
+  --md-text-font: "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --md-code-font: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --md-primary-fg-color: #070706;
+  --md-primary-fg-color--light: #11110f;
+  --md-primary-fg-color--dark: #070706;
+  --md-accent-fg-color: #d8813f;
 }
 
 [data-md-color-scheme="slate"] {
-  --md-default-bg-color: #0c1116;
-  --md-default-fg-color: #e8eef2;
-  --md-typeset-a-color: #3fdfa0;
-  --md-code-bg-color: #11181f;
+  --md-default-bg-color: #070706;
+  --md-default-fg-color: #eee8dc;
+  --md-typeset-a-color: #d8813f;
+  --md-code-bg-color: #11110f;
 }
 
-/* Screenshot frames: terminal-window chrome. */
+/* Screenshot frames: hairline instrument chrome. */
 .pitwall-shot {
-  border: 1px solid #1f2a33;
-  border-radius: 0.6rem;
-  background: #0c1116;
+  border: 1px solid rgba(216, 214, 204, 0.22);
+  background: #070706;
   padding: 0.4rem;
-  box-shadow: 0 12px 32px rgb(0 0 0 / 45%);
 }
 
 .pitwall-shot img {
@@ -33,13 +35,12 @@
   display: inline-block;
   min-width: 1.6em;
   padding: 0.1em 0.45em;
-  border: 1px solid #2a3742;
+  border: 1px solid rgba(216, 214, 204, 0.22);
   border-bottom-width: 3px;
-  border-radius: 0.35em;
-  background: #11181f;
+  background: #11110f;
   font-family: var(--md-code-font-family);
   text-align: center;
-  color: #3fdfa0;
+  color: #d8813f;
 }
 
 .pitwall-hero {
