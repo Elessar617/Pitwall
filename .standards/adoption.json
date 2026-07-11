@@ -1,7 +1,7 @@
 {
   "standards_version": "2.0.0",
-  "source_revision": "4f8d51c23e5f1eca3c803d9bbabe12335504f8e2",
-  "manifest_sha256": "94e62c1abfafa477defcadc8d6835d691e4802de77881c5c5ead88971a851f23",
-  "digest_sha256": "5334fdc769011b712573d3856503c7275208cc7ce703600df2fec95ebfa2fb4e",
+  "source_revision": "38fc1727fe934db65d6a125bd982af52af9bedd3",
+  "manifest_sha256": "9cb24598c6dd749b760edb95bbe261207a4165ec2c654f2ecaa14d0edcb87a78",
+  "digest_sha256": "cc6ea3bfff1330d51c5ea55fee15f9162f982571de757e05e158c98c9223f472",
   "language_mappings_sha256": "cdf5bfa5302cb038ea867d0f6e926165ab2614a4bd07bb26c50008cb46ecdd6d"
 }
